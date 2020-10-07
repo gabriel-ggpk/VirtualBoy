@@ -3,7 +3,8 @@
 
 # Prerequisites
 *.d
-
+Makefile
+Makefile.Android
 # Object files
 *.o
 *.ko
