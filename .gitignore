@@ -1,10 +1,10 @@
 #Vscode file
 .vscode/
-
-# Prerequisites
-*.d
 Makefile
 Makefile.Android
+# Prerequisites
+*.d
+
 # Object files
 *.o
 *.ko
