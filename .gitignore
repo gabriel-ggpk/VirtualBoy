@@ -1,6 +1,7 @@
 #Vscode file
 .vscode/
-
+Makefile
+Makefile.Android
 # Prerequisites
 *.d
 
