@@ -1,5 +1,4 @@
 #include <raylib.h>
-#include "Fase4.c"
 
 int main(){
     int windowWidth = 800, windowHeight = 450;
