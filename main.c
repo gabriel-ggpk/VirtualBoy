@@ -1,7 +1,8 @@
 #include <raylib.h>
+#include "Boss.c"
 
 int main(){
-    int windowWidth = 800, windowHeight = 450;
+    int windowWidth = 960, windowHeight = 540;
     int fase = 0;
 
     InitWindow(windowWidth, windowHeight, "Não temos um nome");
@@ -24,6 +25,7 @@ int main(){
                 DrawText("Escolha uma fase 1, 2, 3 ou 4", 150, windowHeight/2, 20, BLACK);
             EndDrawing();
             break;
+
            case 1:
             if(IsKeyPressed(KEY_ZERO))
                 fase = 0;
@@ -32,6 +34,7 @@ int main(){
                 ClearBackground(RED);
             EndDrawing();
             break;
+
            case 2:
             if(IsKeyPressed(KEY_ZERO))
                 fase = 0;
@@ -40,6 +43,7 @@ int main(){
                 ClearBackground(BLUE);
             EndDrawing();
             break;
+
            case 3:
             if(IsKeyPressed(KEY_ZERO))
                 fase = 0;
@@ -48,13 +52,11 @@ int main(){
                 ClearBackground(YELLOW);
             EndDrawing();
             break;
+
            case 4:
-            if(IsKeyPressed(KEY_ZERO))
+            if(BOSS() == 1){
                 fase = 0;
-            BeginDrawing();
-                DrawText("Aperte 0 para voltar", 150, windowHeight/2, 20, BLACK);
-                ClearBackground(GREEN);
-            EndDrawing();
+            }
             break; 
         }
     }
