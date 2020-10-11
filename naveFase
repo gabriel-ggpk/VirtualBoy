@@ -1,0 +1,106 @@
+#include "raylib.h"
+
+//Define struct do jogador.
+typedef struct 
+{
+    float Velocidade;
+    Vector2 NaveLocal;
+    Color Cor;
+} Jogador;
+
+static int Movimento = 2;
+
+static Jogador jogador;
+
+static Texture2D Nave[5];
+
+//Inicializa
+static void Iniciar(void);   
+//Atualiza     
+static void Atualizar(void);  
+//Desenha    
+static void Desenhando(void);
+//Descarrega
+static void Descarregar(void);
+
+void Iniciar(void)
+{
+    jogador.NaveLocal.x = 640;
+    jogador.NaveLocal.y = 320;
+    jogador.Cor = WHITE;
+    jogador.Velocidade = 6.0;
+
+    Nave[0] = LoadTexture("assets/Fase3/Nave3E.png");
+    Nave[1] = LoadTexture("assets/Fase3/Nave2E.png");
+    Nave[2] = LoadTexture("assets/Fase3/Nave1.png");
+    Nave[3] = LoadTexture("assets/Fase3/Nave2D.png");
+    Nave[4] = LoadTexture("assets/Fase3/Nave3D.png");    
+}
+
+void Atualizar(void)
+{
+    //Movimentacao, comportamento e movimentando os sprites.
+    if (IsKeyDown(KEY_RIGHT)){
+         jogador.NaveLocal.x += jogador.Velocidade;
+         Movimento += 1;
+        }
+    if(Movimento >= 4) Movimento = 4;
+    if (IsKeyReleased(KEY_RIGHT)) Movimento = 2;
+    if (jogador.NaveLocal.x >= GetScreenWidth() - 64) jogador.NaveLocal.x = GetScreenWidth() - 64;
+
+    if (IsKeyDown(KEY_LEFT)){
+         jogador.NaveLocal.x -= jogador.Velocidade;
+         Movimento -= 1;
+        }
+    if(Movimento <= 0) Movimento = 0;
+    if (IsKeyReleased(KEY_LEFT)) Movimento = 2;
+    if (jogador.NaveLocal.x <= 0) jogador.NaveLocal.x = 0;
+    
+    if (IsKeyDown(KEY_UP)) jogador.NaveLocal.y -= jogador.Velocidade;
+    if (jogador.NaveLocal.y <= 0) jogador.NaveLocal.y = 0;
+
+    if (IsKeyDown(KEY_DOWN))  jogador.NaveLocal.y += jogador.Velocidade;
+    if (jogador.NaveLocal.y >= GetScreenHeight() - 64) jogador.NaveLocal.y = GetScreenHeight() - 64;
+}
+
+void Desenhando(void)
+{
+    //Vetores para HitBox do jogador
+        Vector2 V1 = {jogador.NaveLocal.x + 32, jogador.NaveLocal.y};
+        Vector2 V2 = {jogador.NaveLocal.x, jogador.NaveLocal.y + 64};
+        Vector2 V3 = {jogador.NaveLocal.x + 64, jogador.NaveLocal.y + 64};
+
+    BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        DrawText("Mova a nave com as setas", 15, 15, 25, DARKGRAY);
+
+        DrawTriangle(V1, V2, V3, BLACK);
+
+        DrawTexture(Nave[Movimento], jogador.NaveLocal.x, jogador.NaveLocal.y, WHITE);
+    EndDrawing();
+}    
+
+void Descarregar(void)
+{
+    UnloadTexture(Nave[Movimento]);
+}
+
+int Fase3()
+{
+    int retorno3 = 0;
+    Iniciar();
+    
+    while ( retorno3 == 0  )
+    {
+        if(IsKeyPressed(KEY_ZERO)){
+            retorno3 = 1;
+        }
+        Atualizar();
+        Desenhando();
+    }
+    Descarregar();
+    
+    return retorno3;
+
+}
