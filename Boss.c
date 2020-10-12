@@ -8,6 +8,8 @@ typedef struct{
     int vel;
     int lado;
     int linha;
+    Rectangle colisao;
+    int dano;
 }hero;
 typedef struct{
     Texture2D imagem;
@@ -18,6 +20,10 @@ typedef struct{
     Texture2D imagem;
     Rectangle frameRec;
     Vector2 posi;
+    int atirar;
+    int vel;
+    int tiroVel;
+    Rectangle colisao;
 }laser;
 typedef struct{
     Texture2D image;
@@ -28,6 +34,8 @@ hero virtualGuy;
 chefe computador;
 laser armaLaserDir;
 laser armaLaserEsc;
+
+int lasersAtivos = 1;
 
 //partes da sala base
 Imagem assets;
@@ -47,9 +55,14 @@ Rectangle paredeComputadorEsc;
 //sala base do jogo
 void inicializarSala(Texture2D cena);
 void drawSala();
+//laser movimentos
+void drawLaser();
+void animaLaser();
+void moveLaser();
 //personagem
 void atualizarPersonagem();
 void animaPersonagem();
+void danoPersonagem();
 
 void inicializarNivelBoss();
 void atualizarNivelBoss();
@@ -82,8 +95,12 @@ int BOSS(){
         if(IsKeyPressed(KEY_ZERO)){
             resultado4 = 1;
         }
+        if(IsKeyPressed(KEY_SPACE)){
+        }
+
         atualizarNivelBoss();
         atualizarPersonagem();
+
         drawNivelBoss();
     }
 
@@ -104,7 +121,10 @@ void inicializarNivelBoss(){
     virtualGuy.posi.y = GetScreenHeight()/2;
     virtualGuy.vel = 3;
     virtualGuy.lado = 1;
+    virtualGuy.dano = 0;
     virtualGuy.linha = 2;
+    virtualGuy.colisao.width = virtualGuy.frameRec.width-32;
+    virtualGuy.colisao.height = virtualGuy.frameRec.height-25;
 
     computador.frameRec.width = computador.imagem.width/5;
     computador.frameRec.height = computador.imagem.height/3;
@@ -113,20 +133,35 @@ void inicializarNivelBoss(){
     computador.posi.x = (GetScreenWidth()/2) - 48;
     computador.posi.y = chao.height*3;
 
-    armaLaserDir.frameRec.width = armaLaserDir.imagem.width;
+    armaLaserDir.frameRec.width = armaLaserDir.imagem.width/3;
     armaLaserDir.frameRec.height = armaLaserDir.imagem.height/32;
-    armaLaserDir.frameRec.x = 0;
+    armaLaserDir.frameRec.x = armaLaserDir.frameRec.width*2;
     armaLaserDir.frameRec.y = armaLaserDir.frameRec.height*16;
-    armaLaserDir.posi.x = GetScreenWidth()/2 + 64;
-    armaLaserDir.posi.y = chao.height*6;
-    armaLaserEsc.frameRec.width = armaLaserDir.imagem.width;
+    armaLaserDir.posi.x = GetScreenWidth()/2 + 205;
+    armaLaserDir.posi.y = chao.height*6 - 32;
+    armaLaserDir.atirar = 0;
+    armaLaserDir.vel = 1.5;
+    armaLaserDir.tiroVel = 40;
+    armaLaserDir.colisao.width = chao.width*17;
+    armaLaserDir.colisao.height = 32;
+    armaLaserDir.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
+    armaLaserEsc.frameRec.width = armaLaserDir.imagem.width/3;
     armaLaserEsc.frameRec.height = armaLaserDir.imagem.height/32;
     armaLaserEsc.frameRec.x = 0;
     armaLaserEsc.frameRec.y = armaLaserDir.frameRec.height*0;
     armaLaserEsc.posi.x = (GetScreenWidth()-tetoLinha.width*17)/2;
-    armaLaserEsc.posi.y = chao.height*6;
+    armaLaserEsc.posi.y = chao.height*12 + 4;
+    armaLaserEsc.atirar = 0;
+    armaLaserEsc.vel = 1.5;
+    armaLaserEsc.tiroVel = 40;
+    armaLaserEsc.colisao.width = chao.width*17;
+    armaLaserEsc.colisao.height = 32;
+    armaLaserEsc.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
 }
 void atualizarNivelBoss(){
+    animaLaser();
+    moveLaser();
+    
     static int frameCont  = 0;
     static int frameAtual  = 0;
     static int direction  = -1;
@@ -140,65 +175,63 @@ void atualizarNivelBoss(){
         }
         computador.frameRec.x = computador.frameRec.width*frameAtual;
     }
-
-    //movimentar lasers
-    if(direction == -1){
-        if(armaLaserDir.posi.y <= chao.height*12){
-            armaLaserDir.posi.y += 1;
-            armaLaserEsc.posi.y += 1;
-        }
-        else
-            direction = 1;
-    }
-    else{
-        if(armaLaserDir.posi.y >= chao.height*6){
-            armaLaserDir.posi.y -= 1;
-            armaLaserEsc.posi.y -= 1;
-        }
-        else
-            direction = -1;
-    }
-    
 }
 void drawNivelBoss(){
     BeginDrawing();
         ClearBackground(GREEN);
-        
         drawSala();
-
         DrawTextureRec(computador.imagem, computador.frameRec, computador.posi, RAYWHITE);
 
+        DrawRectangle(armaLaserDir.colisao.x, armaLaserDir.colisao.y, armaLaserDir.colisao.width, armaLaserDir.colisao.height, RED);
+        DrawRectangle(armaLaserEsc.colisao.x, armaLaserEsc.colisao.y, armaLaserEsc.colisao.width, armaLaserEsc.colisao.height, ORANGE);
+        DrawRectangle(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, YELLOW);
+        
+        drawLaser();
+        
         DrawTextureRec(virtualGuy.imagem, virtualGuy.frameRec, virtualGuy.posi, RAYWHITE);
-
-        DrawTextureRec(armaLaserDir.imagem, armaLaserDir.frameRec, armaLaserDir.posi, RAYWHITE);
-        DrawTextureRec(armaLaserDir.imagem, armaLaserEsc.frameRec, armaLaserEsc.posi, RAYWHITE);
 
     EndDrawing();
 }
 
+//personagem movimentos
 void atualizarPersonagem(){
     animaPersonagem();
 
+    if(virtualGuy.dano <= 0){ 
+        virtualGuy.colisao.x = virtualGuy.posi.x + 18;
+        virtualGuy.colisao.y = virtualGuy.posi.y + 18;
+    }
+    if(virtualGuy.dano > 0){ 
+        virtualGuy.colisao.x = 0;
+        virtualGuy.colisao.y = 0;
+    }
+
+    virtualGuy.dano--;
+
     if(IsKeyDown(KEY_UP)){
-        if(virtualGuy.posi.y > chao.height*4.5){
+        if(virtualGuy.posi.y > chao.height*5){
             virtualGuy.posi.y -= virtualGuy.vel;
         }
-        if(virtualGuy.lado == 1){
-            virtualGuy.linha = 0;
-        }
-        if(virtualGuy.lado == -1){
-            virtualGuy.linha = 1;
+        if(virtualGuy.dano <= 0){     
+            if(virtualGuy.lado == 1){
+                virtualGuy.linha = 0;
+            }
+            if(virtualGuy.lado == -1){
+                virtualGuy.linha = 1;
+            }
         }
     }
     if(IsKeyDown(KEY_DOWN)){
         if(virtualGuy.posi.y < chao.height*12){
             virtualGuy.posi.y += virtualGuy.vel;
         }
-        if(virtualGuy.lado == 1){
-            virtualGuy.linha = 0;
-        }
-        if(virtualGuy.lado == -1){
-            virtualGuy.linha = 1;
+        if(virtualGuy.dano <= 0){ 
+            if(virtualGuy.lado == 1){
+                virtualGuy.linha = 0;
+            }
+            if(virtualGuy.lado == -1){
+                virtualGuy.linha = 1;
+            }
         }
     }
     if(IsKeyDown(KEY_LEFT)){
@@ -206,25 +239,58 @@ void atualizarPersonagem(){
         if(virtualGuy.posi.x > (GetScreenWidth()-tetoLinha.width*17)/2 -10){
             virtualGuy.posi.x -= virtualGuy.vel;
         } 
-        virtualGuy.linha = 1;
+        if(virtualGuy.dano <= 0){     
+            virtualGuy.linha = 1;
+        }
+        if(virtualGuy.dano > 0){     
+            virtualGuy.linha = 5;
+        }
     }
     if(IsKeyDown(KEY_RIGHT)){
         virtualGuy.lado = 1;
         if(virtualGuy.posi.x < GetScreenWidth()/2 + 216){
             virtualGuy.posi.x += virtualGuy.vel;
         }
-        virtualGuy.linha = 0;
+        if(virtualGuy.dano <= 0){ 
+            virtualGuy.linha = 0;
+        }
+        if(virtualGuy.dano > 0){     
+            virtualGuy.linha = 4;
+        }
     }
 
     if(IsKeyReleased(KEY_UP)){
-        if(virtualGuy.lado == 1){
-            virtualGuy.linha = 2;
-        }
-        if(virtualGuy.lado == -1){
-            virtualGuy.linha = 3;
+        if(virtualGuy.dano <= 0){     
+            if(virtualGuy.lado == 1){
+                virtualGuy.linha = 2;
+            }
+            if(virtualGuy.lado == -1){
+                virtualGuy.linha = 3;
+            }
         }
     }
     if(IsKeyReleased(KEY_DOWN)){
+        if(virtualGuy.dano <= 0){    
+            if(virtualGuy.lado == 1){
+                virtualGuy.linha = 2;
+            }
+            if(virtualGuy.lado == -1){
+                virtualGuy.linha = 3;
+            }
+        }
+    }
+    if(IsKeyReleased(KEY_LEFT)){
+        if(virtualGuy.dano <= 0){ 
+            virtualGuy.linha = 3;
+        }
+    }
+    if(IsKeyReleased(KEY_RIGHT)){
+        if(virtualGuy.dano <= 0){     
+            virtualGuy.linha = 2;
+        }
+    }
+
+    if(virtualGuy.dano == 0){
         if(virtualGuy.lado == 1){
             virtualGuy.linha = 2;
         }
@@ -232,11 +298,24 @@ void atualizarPersonagem(){
             virtualGuy.linha = 3;
         }
     }
-    if(IsKeyReleased(KEY_LEFT)){
-        virtualGuy.linha = 3;
+
+    if(CheckCollisionRecs(virtualGuy.colisao, armaLaserEsc.colisao)){
+        virtualGuy.dano = 60;
+        if(virtualGuy.lado == 1){
+            virtualGuy.linha = 4;
+        }
+        if(virtualGuy.lado == -1){
+            virtualGuy.linha = 5;
+        }
     }
-    if(IsKeyReleased(KEY_RIGHT)){
-        virtualGuy.linha = 2;
+    if(CheckCollisionRecs(virtualGuy.colisao, armaLaserDir.colisao)){
+        virtualGuy.dano = 60;
+        if(virtualGuy.lado == 1){
+            virtualGuy.linha = 4;
+        }
+        if(virtualGuy.lado == -1){
+            virtualGuy.linha = 5;
+        }
     }
 }
 void animaPersonagem(){
@@ -262,6 +341,14 @@ void animaPersonagem(){
             animaVel = 10;
             numeroImagens = 10;
             break;
+        case 4:
+            animaVel = 20;
+            numeroImagens = 6;
+            break;
+        case 5:
+            animaVel = 20;
+            numeroImagens = 6;
+            break;
     }
     
     virtualGuy.frameRec.y = virtualGuy.frameRec.height*virtualGuy.linha;
@@ -274,6 +361,172 @@ void animaPersonagem(){
             frameAtual = 0;
         }
         virtualGuy.frameRec.x = virtualGuy.frameRec.width*frameAtual;
+    }
+}
+
+
+//laser funcionar
+void drawLaser(){
+    Rectangle armaLaserDirMeio;
+    armaLaserDirMeio.width = armaLaserDir.frameRec.width;
+    armaLaserDirMeio.height = armaLaserDir.frameRec.height;
+    armaLaserDirMeio.x = armaLaserDir.frameRec.width*1;
+    armaLaserDirMeio.y = armaLaserDir.frameRec.y;
+    Rectangle armaLaserDirFim;
+    armaLaserDirFim.width = armaLaserEsc.frameRec.width;
+    armaLaserDirFim.height = armaLaserEsc.frameRec.height;
+    armaLaserDirFim.x = armaLaserDir.frameRec.width*0;
+    armaLaserDirFim.y = armaLaserDir.frameRec.y;
+    Rectangle armaLaserEscMeio;
+    armaLaserEscMeio.width = armaLaserEsc.frameRec.width;
+    armaLaserEscMeio.height = armaLaserEsc.frameRec.height;
+    armaLaserEscMeio.x = armaLaserEsc.frameRec.width*1;
+    armaLaserEscMeio.y = armaLaserEsc.frameRec.y;
+    Rectangle armaLaserEscFim;
+    armaLaserEscFim.width = armaLaserEsc.frameRec.width;
+    armaLaserEscFim.height = armaLaserEsc.frameRec.height;
+    armaLaserEscFim.x = armaLaserEsc.frameRec.width*2;
+    armaLaserEscFim.y = armaLaserEsc.frameRec.y;
+
+    DrawTextureRec(armaLaserDir.imagem, armaLaserEsc.frameRec, armaLaserEsc.posi, RAYWHITE);
+    for(int i = 0; i < 6; i++){
+        DrawTextureRec(armaLaserDir.imagem, armaLaserEscMeio, (Vector2){armaLaserEsc.posi.x + armaLaserEsc.frameRec.width*(i+1), armaLaserEsc.posi.y}, RAYWHITE);
+    }
+    DrawTextureRec(armaLaserDir.imagem, armaLaserEscFim, (Vector2){armaLaserEsc.posi.x + armaLaserEsc.frameRec.width*7, armaLaserEsc.posi.y}, RAYWHITE);
+
+    DrawTextureRec(armaLaserDir.imagem, armaLaserDir.frameRec, armaLaserDir.posi, RAYWHITE);
+    for(int i = 0; i < 6; i++){
+        DrawTextureRec(armaLaserDir.imagem, armaLaserDirMeio, (Vector2){armaLaserDir.posi.x - armaLaserDir.frameRec.width*(i+1), armaLaserDir.posi.y}, RAYWHITE);
+    }
+    DrawTextureRec(armaLaserDir.imagem, armaLaserDirFim, (Vector2){armaLaserDir.posi.x - armaLaserDir.frameRec.width*7, armaLaserDir.posi.y}, RAYWHITE);
+}
+void animaLaser(){
+    static int frameAtualEsc = 0;
+    static int frameContEsc = 0;
+    static int frameAtualDir = 16;
+    static int frameContDir = 0;
+
+    if(armaLaserEsc.atirar != 0){
+        frameContEsc++;
+        if(frameContEsc >= 60/10){
+            frameContEsc = 0;
+            frameAtualEsc++;
+            if(frameAtualEsc == 5){
+                armaLaserEsc.colisao.y = armaLaserEsc.posi.y + (armaLaserEsc.frameRec.height/4);
+            }
+            if(frameAtualEsc == 11){
+                armaLaserEsc.colisao.y = 0;
+            }
+            if(frameAtualEsc > 15){
+                frameAtualEsc = 0;
+                armaLaserEsc.atirar = 0;
+            }
+            armaLaserEsc.frameRec.y = armaLaserEsc.frameRec.height*frameAtualEsc;
+        }
+    }
+    if(armaLaserDir.atirar != 0){
+        frameContDir++;
+        if(frameContDir >= 60/10){
+            frameContDir = 0;
+            frameAtualDir++;
+            if(frameAtualDir == 21){
+                armaLaserDir.colisao.y = armaLaserDir.posi.y + (armaLaserDir.frameRec.height/4);
+            }
+            if(frameAtualDir == 27){
+                armaLaserDir.colisao.y = 0;
+            }
+            if(frameAtualDir > 31){
+                frameAtualDir = 16;
+                armaLaserDir.atirar = 0;
+            }
+            armaLaserDir.frameRec.y = armaLaserDir.frameRec.height*frameAtualDir;
+        }
+    }
+}
+void moveLaser(){
+    static int directionLaserDir = 1;
+    static int directionLaserEsc = -1;
+    static int pararLaserDir = 0;
+    static int pararLaserEsc = 0;
+    static int esperarDir = 0;
+    static int esperarEsc = 0;
+    static int descansarDir = 0;
+    static int descansarEsc = 0;
+
+    if(lasersAtivos != 0){
+        descansarDir--;
+        if(descansarDir <=0){
+            if(armaLaserDir.posi.y - (armaLaserDir.frameRec.height/2) > virtualGuy.posi.y-(2* virtualGuy.frameRec.height/4) &&
+               armaLaserDir.posi.y - (armaLaserDir.frameRec.height/2)< virtualGuy.posi.y - (virtualGuy.frameRec.height/3)){
+                pararLaserDir = 1;
+                descansarDir = 100;
+            }
+        }
+        if(pararLaserDir == 1){
+            esperarDir++;
+            if(esperarDir == armaLaserDir.tiroVel){
+                armaLaserDir.atirar = 1;
+            }
+            if(esperarDir == armaLaserDir.tiroVel + 120){
+                pararLaserDir = 0;
+                esperarDir = 0;
+            }
+        }
+
+        descansarEsc--;
+        if(descansarEsc <=0){
+            if(armaLaserEsc.posi.y - (armaLaserEsc.frameRec.height/2) > virtualGuy.posi.y-(2* virtualGuy.frameRec.height/4) &&
+               armaLaserEsc.posi.y - (armaLaserEsc.frameRec.height/2) < virtualGuy.posi.y - (virtualGuy.frameRec.height/3)){
+                pararLaserEsc = 1;
+                descansarEsc = 100;
+            }
+        }
+        if(pararLaserEsc == 1){
+            esperarEsc++;
+            if(esperarEsc == armaLaserEsc.tiroVel){
+                armaLaserEsc.atirar = 1;
+            }
+            if(esperarEsc == armaLaserEsc.tiroVel+ 120){
+                pararLaserEsc = 0;
+                esperarEsc = 0;
+            }
+        }
+    }
+
+    if(directionLaserDir == 1){
+        if(pararLaserDir == 0){
+            armaLaserDir.posi.y += armaLaserDir.vel;
+        }
+
+        if(armaLaserDir.posi.y >= chao.height*12 + 4){
+            directionLaserDir = -1;
+        }
+    }
+    if(directionLaserDir == -1){
+        if(pararLaserDir == 0){
+            armaLaserDir.posi.y -= armaLaserDir.vel;
+        }
+        if(armaLaserDir.posi.y <= chao.height*6 - 32){
+            directionLaserDir = 1;
+        }
+    }
+
+    if(directionLaserEsc == 1){
+        if(pararLaserEsc == 0){
+            armaLaserEsc.posi.y += armaLaserEsc.vel;
+        }
+
+        if(armaLaserEsc.posi.y >= chao.height*12 + 4){
+            directionLaserEsc = -1;
+        }
+    }
+    if(directionLaserEsc == -1){
+        if(pararLaserEsc == 0){
+            armaLaserEsc.posi.y -= armaLaserEsc.vel;
+        }
+        if(armaLaserEsc.posi.y <= chao.height*6 - 32){
+            directionLaserEsc = 1;
+        }
     }
 }
 
