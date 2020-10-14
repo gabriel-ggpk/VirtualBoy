@@ -1,9 +1,9 @@
 #include <raylib.h>
 #include "Boss.c"
-#include "naveFase"
+#include "naveFase.c"
 
 int main(){
-    int windowWidth = 960, windowHeight = 540;
+    int windowWidth = 1280, windowHeight = 720;
     int fase = 0;
 
     InitWindow(windowWidth, windowHeight, "Não temos um nome");
@@ -48,6 +48,9 @@ int main(){
            case 3:
             if(Fase3() == 1){
                 fase = 0;
+            }
+            else if(Fase3() == 2){
+                fase = 4;
             }
             break; 
 
