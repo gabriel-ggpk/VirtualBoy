@@ -35,11 +35,10 @@ Assets background;
 
 void initGame(){
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    SetWindowSize(screenWidth, screenHeight);
+    //SetWindowSize(screenWidth, screenHeight);
     //ToggleFullscreen();
     InitPhysics();
     SetPhysicsGravity(0.0f, 1.1f);
-    SetTargetFPS(60);
 
     ground.image = LoadTexture("assets/FaseRunner/ground.png");
     ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, screenHeight}, 200000, 100, 10);
@@ -49,6 +48,8 @@ void initGame(){
     personagem.body = CreatePhysicsBodyRectangle((Vector2){400, 390}, 20, 28, 1);
     personagem.body->freezeOrient = true;
     personagem.texture = LoadTexture("assets/full.png");
+    //personagem.texture.width = personagem.texture.width*2;
+    //personagem.texture.height = personagem.texture.height*2;
     personagem.width = personagem.texture.width/12;
     personagem.height = personagem.texture.height/14;
     personagem.frame = 0;
@@ -236,14 +237,14 @@ void desenho(){
 
         int ground_size = 100000/ground.image.width;
         for(int i = -8; i < ground_size; i++){
-            DrawTextureEx(ground.image, (Vector2){ground.image.width * 2.5 * i, 400}, 0.0f, 2.5f, RAYWHITE);
+            DrawTextureEx(ground.image, (Vector2){ground.image.width * 2.5 * i, GetScreenHeight() - ground.image.height*2}, 0.0f, 2.5f, RAYWHITE);
             DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 0}, 0.0f, 1.6f, RAYWHITE);
         }
 
         DrawTextureRec(
             personagem.texture,
             personagem.rec,
-            (Vector2){personagem.body->position.x - 17, personagem.body->position.y - 17},
+            (Vector2){personagem.body->position.x - 17, GetScreenHeight() - ground.image.height*2 - personagem.height},
             RAYWHITE);
 
         for(int i = 0; i < 3; i++){
