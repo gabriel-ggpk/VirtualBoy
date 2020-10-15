@@ -240,6 +240,7 @@ void desenho(){
             DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 0}, 0.0f, 1.6f, RAYWHITE);
         }
 
+        DrawRectangleRec(personagem.collision, GREEN);
         DrawTextureRec(
             personagem.texture,
             personagem.rec,
@@ -247,8 +248,10 @@ void desenho(){
             RAYWHITE);
 
         for(int i = 0; i < 3; i++){
+            DrawRectangleRec(rock[i].collision, GREEN);
             DrawTextureEx(rock[i].texture, (Vector2){rock[i].position.x, rock[i].position.y}, 0.0f, 2.5f, RAYWHITE);
             
+            DrawRectangleRec(bird[i].collision, GREEN);
             Rectangle birdrec = {bird[i].width * bird[i].frame, bird[i].height, bird[i].width, bird[i].height};
             bird[i].rec = birdrec;            
             DrawTextureRec(
