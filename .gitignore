@@ -2,6 +2,7 @@
 .vscode/
 Makefile
 Makefile.Android
+main
 # Prerequisites
 *.d
 

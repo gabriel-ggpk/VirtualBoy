@@ -1,16 +1,17 @@
 #include <raylib.h>
 #include "Boss.c"
 #include "naveFase.c"
+#include "faseRunner.c"
 
 int main(){
     int windowWidth = 1280, windowHeight = 720;
     int fase = 0;
 
     InitWindow(windowWidth, windowHeight, "Não temos um nome");
-    
+
     SetTargetFPS(60);
     while(!WindowShouldClose()){
-        
+
         switch(fase){
            case 0:
             if(IsKeyPressed(KEY_ONE))
@@ -52,17 +53,17 @@ int main(){
             else if(Fase3() == 2){
                 fase = 4;
             }
-            break; 
+            break;
 
            case 4:
             if(BOSS() == 1){
                 fase = 0;
             }
-            break; 
+            break;
         }
     }
 
     CloseWindow();
-    
+
     return 0;
 }
