@@ -15,6 +15,7 @@ typedef struct{
     Texture2D imagem;
     Rectangle frameRec;
     Vector2 posi;
+    Rectangle colisao;
 }chefe;
 typedef struct{
     Texture2D imagem;
@@ -30,6 +31,7 @@ typedef struct{
     Texture2D imagemTiro;
     Rectangle frameRec;
     Vector2 posi;
+    int explodir;
 }canhao;
 typedef struct{
     Texture2D image;
@@ -42,9 +44,8 @@ laser armaLaserDir;
 laser armaLaserEsc;
 canhao armaCanhao;
 
-int lasersAtivos = 1;
+int lasersAtivos = 0;
 int canhaoAtiva = 0;
-int explodir = 0;
 
 //partes da sala base
 Imagem assets;
@@ -74,6 +75,8 @@ void atiraCanhao();
 //personagem
 void atualizarPersonagem();
 void animaPersonagem();
+//rotina da luta
+void rotinaJogo();
 
 void inicializarNivelBoss();
 void atualizarNivelBoss();
@@ -116,7 +119,6 @@ int BOSS(){
             resultado4 = 1;
         }
         if(IsKeyPressed(KEY_SPACE)){
-            canhaoAtiva = 1;
         }
 
         atualizarNivelBoss();
@@ -146,15 +148,21 @@ void inicializarNivelBoss(){
     virtualGuy.lado = 1;
     virtualGuy.dano = 0;
     virtualGuy.linha = 2;
+    virtualGuy.colisao.x = virtualGuy.posi.x;
+    virtualGuy.colisao.y = virtualGuy.posi.y;
     virtualGuy.colisao.width = virtualGuy.frameRec.width-32;
-    virtualGuy.colisao.height = virtualGuy.frameRec.height-25;
+    virtualGuy.colisao.height = virtualGuy.frameRec.height-40;
 
     computador.frameRec.width = computador.imagem.width/5;
     computador.frameRec.height = computador.imagem.height/3;
     computador.frameRec.x = computador.frameRec.width*0;
     computador.frameRec.y = computador.frameRec.height*2;
-    computador.posi.x = (GetScreenWidth()/2) - 48;
-    computador.posi.y = chao.height*3;
+    computador.posi.x = (GetScreenWidth()/2) - chao.width*1.5;
+    computador.posi.y = chao.height*4;
+    computador.colisao.width = computador.frameRec.width - 32;
+    computador.colisao.height = computador.frameRec.height/1.5;
+    computador.colisao.x = computador.posi.x + 16;
+    computador.colisao.y = computador.posi.y;
 
     armaLaserDir.frameRec.width = armaLaserDir.imagem.width/3;
     armaLaserDir.frameRec.height = armaLaserDir.imagem.height/32;
@@ -183,10 +191,10 @@ void inicializarNivelBoss(){
 
     armaCanhao.frameRec.width = armaCanhao.imagemTiro.width/11;
     armaCanhao.frameRec.height = armaCanhao.imagemTiro.height;
-    armaCanhao.frameRec.x = armaCanhao.frameRec.height*2;
+    armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
     armaCanhao.frameRec.y = 0;
     armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-    armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*2.8);
+    armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*0.8);
 }
 void atualizarNivelBoss(){
     animaPersonagem();
@@ -197,9 +205,14 @@ void atualizarNivelBoss(){
     animaCanhao();
     atiraCanhao();
     
+    rotinaJogo();
+
+    if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 5.0, computador.colisao)){
+        computador.frameRec.x = computador.frameRec.width*4;
+    }
+    
     static int frameCont  = 0;
     static int frameAtual  = 0;
-
     frameCont++;
     if (frameCont >= 60/2){
         frameCont = 0;
@@ -221,11 +234,37 @@ void drawNivelBoss(){
 
         drawLaser();
 
-        DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*5), RAYWHITE);
+        DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*3), RAYWHITE);
         DrawTextureRec(armaCanhao.imagemTiro, armaCanhao.frameRec, armaCanhao.posi, GREEN);
 
-        //DrawCircleLines(armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2), 5.0, RED);
+        //DrawRectangleLines(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, BLUE);
+        //DrawCircleLines(armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2), 10.0, RED);
     EndDrawing();
+}
+
+//rotina do jogo
+void rotinaJogo(){
+    static int frameCont  = 0;
+    static int frameAtual  = 0;
+
+    if(armaCanhao.explodir == 0){
+        frameCont++;
+        if (frameCont >= 60){
+            frameCont = 0;
+            frameAtual++;
+            if(frameAtual > 2){
+                frameAtual = 0;
+                armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
+                armaCanhao.frameRec.y = 0;
+                armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
+                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*0.8);
+            }
+            if(frameAtual == 2){
+                canhaoAtiva = 1;
+            }
+            armaCanhao.frameRec.x = armaCanhao.frameRec.width*frameAtual;
+        }
+    }
 }
 
 //personagem movimentos
@@ -243,7 +282,7 @@ void atualizarPersonagem(){
         virtualGuy.dano--;
 
     if(IsKeyDown(KEY_UP)){
-        if(virtualGuy.posi.y > chao.height*5){
+        if(virtualGuy.posi.y > chao.height*6){
             virtualGuy.posi.y -= virtualGuy.vel;
         }
         if(virtualGuy.dano <= 0){     
@@ -256,7 +295,7 @@ void atualizarPersonagem(){
         }
     }
     if(IsKeyDown(KEY_DOWN)){
-        if(virtualGuy.posi.y < chao.height*12){
+        if(virtualGuy.posi.y < chao.height*13){
             virtualGuy.posi.y += virtualGuy.vel;
         }
         if(virtualGuy.dano <= 0){ 
@@ -351,9 +390,9 @@ void atualizarPersonagem(){
             virtualGuy.linha = 5;
         }
     }
-    if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 5.0, virtualGuy.colisao)){
+    if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 10.0, virtualGuy.colisao)){
         virtualGuy.dano = 60;
-        explodir = 1;
+        armaCanhao.explodir = 1;
         canhaoAtiva = 0;
         if(virtualGuy.lado == 1){
             virtualGuy.linha = 4;
@@ -408,7 +447,6 @@ void animaPersonagem(){
         virtualGuy.frameRec.x = virtualGuy.frameRec.width*frameAtual;
     }
 }
-
 
 //laser funcionar
 void drawLaser(){
@@ -543,7 +581,7 @@ void moveLaser(){
             armaLaserDir.posi.y += armaLaserDir.vel;
         }
 
-        if(armaLaserDir.posi.y >= chao.height*12 + 4){
+        if(armaLaserDir.posi.y >= chao.height*13 + 4){
             directionLaserDir = -1;
         }
     }
@@ -551,7 +589,7 @@ void moveLaser(){
         if(pararLaserDir == 0){
             armaLaserDir.posi.y -= armaLaserDir.vel;
         }
-        if(armaLaserDir.posi.y <= chao.height*6 - 32){
+        if(armaLaserDir.posi.y <= chao.height*6){
             directionLaserDir = 1;
         }
     }
@@ -561,7 +599,7 @@ void moveLaser(){
             armaLaserEsc.posi.y += armaLaserEsc.vel;
         }
 
-        if(armaLaserEsc.posi.y >= chao.height*12 + 4){
+        if(armaLaserEsc.posi.y >= chao.height*13 + 4){
             directionLaserEsc = -1;
         }
     }
@@ -569,7 +607,7 @@ void moveLaser(){
         if(pararLaserEsc == 0){
             armaLaserEsc.posi.y -= armaLaserEsc.vel;
         }
-        if(armaLaserEsc.posi.y <= chao.height*6 - 32){
+        if(armaLaserEsc.posi.y <= chao.height*6){
             directionLaserEsc = 1;
         }
     }
@@ -580,18 +618,16 @@ void animaCanhao(){
     static int frameCont  = 0;
     static int frameAtual  = 3;
 
-    if(explodir != 0){
+    if(armaCanhao.explodir != 0){
         frameCont++;
         if (frameCont >= 60/10){
             frameCont = 0;
             frameAtual++;
             if(frameAtual > 10){
                 frameAtual = 2;
-                armaCanhao.frameRec.x = armaCanhao.frameRec.height*2;
-                armaCanhao.frameRec.y = 0;
                 armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*2.8);
-                explodir = 0;
+                armaCanhao.posi.y = GetScreenHeight()*2;
+                armaCanhao.explodir = 0;
             }
             armaCanhao.frameRec.x = armaCanhao.frameRec.width*frameAtual;
         }
@@ -618,20 +654,20 @@ void atiraCanhao(){
 
         
         if(armaCanhao.posi.x > (GetScreenWidth()/2) + chao.width*7){
-            explodir = 1;
             canhaoAtiva = 0;
+            armaCanhao.explodir = 1;
         }
         if(armaCanhao.posi.x < (GetScreenWidth()/2) - chao.width*10){
-            explodir = 1;
             canhaoAtiva = 0;
+            armaCanhao.explodir = 1;
         }
-        if(armaCanhao.posi.y < chao.height*3.5){
-            explodir = 1;
+        if(armaCanhao.posi.y < chao.height*4.5){
             canhaoAtiva = 0;
+            armaCanhao.explodir = 1;
         }
-        if(armaCanhao.posi.y > chao.height*12){
-            explodir = 1;
+        if(armaCanhao.posi.y > chao.height*14){
             canhaoAtiva = 0;
+            armaCanhao.explodir = 1;
         } 
     }
 }
@@ -687,7 +723,7 @@ void inicializarSala(Texture2D cena){
 }
 void drawSala(){
     int comeX = (GetScreenWidth()-tetoLinha.width*17)/2;
-    int comeY = tetoLinha.height*2;
+    int comeY = tetoLinha.height*3;
 
     for(int i = 0; i < 17; i++)
         DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY}, RAYWHITE);
