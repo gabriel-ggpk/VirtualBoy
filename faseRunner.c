@@ -41,11 +41,11 @@ void initGame(){
     SetPhysicsGravity(0.0f, 1.1f);
 
     ground.image = LoadTexture("assets/FaseRunner/ground.png");
-    ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, screenHeight}, 200000, 100, 10);
+    ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, GetScreenHeight() -ground.image.height*1.5}, 200000, 100, 10);
     ground.body->enabled = false;
     background.image = LoadTexture("assets/FaseRunner/bg.png");
 
-    personagem.body = CreatePhysicsBodyRectangle((Vector2){400, 390}, 20, 28, 1);
+    personagem.body = CreatePhysicsBodyRectangle((Vector2){400, GetScreenHeight() -ground.image.height*1.5}, 20, 28, 1);
     personagem.body->freezeOrient = true;
     personagem.texture = LoadTexture("assets/full.png");
     //personagem.texture.width = personagem.texture.width*2;
@@ -144,7 +144,7 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 2.75 && timer >= 2 && !dead){
+    if(frame_spawn >= 5 && timer >= 2 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;
@@ -155,42 +155,42 @@ void spawn(){
         rand_spawn1 = GetRandomValue(1, 3);
 
         if(rand_spawn == 1){
-            bird[0].position.x = personagem.body->position.x + 600;
-            bird[0].position.y = 320;
+            bird[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
+            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -100 -personagem.height;
             if(rand_spawn1 == 1){
-                bird[1].position.x = personagem.body->position.x + 750;
-                bird[1].position.y = 280;
+                bird[1].position.x = personagem.body->position.x + GetScreenWidth() -50;
+                bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -140 -personagem.height;
             }
             else{
-                bird[2].position.x = personagem.body->position.x + 750;
-                bird[2].position.y = 360;
+                bird[2].position.x = personagem.body->position.x + GetScreenWidth() -50;
+                bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -60 -personagem.height;
                 if(rand_spawn1 == 3){
-                    rock[0].position.x = personagem.body->position.x + 600;
-                    rock[0].position.y = 400 - rock[0].height;
+                    rock[0].position.x = personagem.body->position.x +GetScreenWidth() -200;
+                    rock[0].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
                 }
             }
         }
         else if(rand_spawn == 2){
-            bird[0].position.x = personagem.body->position.x + 600;
-            bird[0].position.y = 320;
-            bird[1].position.x = personagem.body->position.x + 600;
-            bird[1].position.y = 280;
-            bird[2].position.x = personagem.body->position.x + 600;
-            bird[2].position.y = 360;
+            bird[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
+            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -100 -personagem.height;
+            bird[1].position.x = personagem.body->position.x + GetScreenWidth() -200;
+            bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -140 -personagem.height;
+            bird[2].position.x = personagem.body->position.x + GetScreenWidth() -200;
+            bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -60 -personagem.height;
         }
         else{
-            rock[0].position.x = personagem.body->position.x + 600;
-            rock[0].position.y = 400 - rock[0].height;
+            rock[0].position.x = personagem.body->position.x +personagem.body->position.x +GetScreenWidth() -200;
+            rock[0].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
             if(rand_spawn1 == 1){
-                rock[1].position.x = personagem.body->position.x + 880;
-                rock[1].position.y = 400 - rock[1].height;
+                rock[1].position.x = personagem.body->position.x +GetScreenWidth() -80;
+                rock[1].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
                 spawn_set = true;
             }
             if(rand_spawn1 == 2){
-                rock[1].position.x = personagem.body->position.x + 880;
-                rock[1].position.y = 400 - rock[1].height;
-                rock[2].position.x = personagem.body->position.x + 1160;
-                rock[2].position.y = 400 - rock[2].height;
+                rock[1].position.x = personagem.body->position.x +GetScreenWidth() -80;
+                rock[1].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
+                rock[2].position.x = personagem.body->position.x +GetScreenWidth() -360;
+                rock[2].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
                 spawn_set = true;
             }
         }
@@ -237,14 +237,14 @@ void desenho(){
 
         int ground_size = 100000/ground.image.width;
         for(int i = -8; i < ground_size; i++){
-            DrawTextureEx(ground.image, (Vector2){ground.image.width * 2.5 * i, GetScreenHeight() - ground.image.height*2}, 0.0f, 2.5f, RAYWHITE);
-            DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 0}, 0.0f, 1.6f, RAYWHITE);
+            DrawTextureEx(ground.image, (Vector2){ground.image.width * 2.5 * i, GetScreenHeight() - ground.image.height*2.5 +personagem.height}, 0.0f, 2.5f, RAYWHITE);
+            DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 92}, 0.0f, 1.6f, RAYWHITE);
         }
 
         DrawTextureRec(
             personagem.texture,
             personagem.rec,
-            (Vector2){personagem.body->position.x - 17, GetScreenHeight() - ground.image.height*2 - personagem.height},
+            (Vector2){personagem.body->position.x, personagem.body->position.y},
             RAYWHITE);
 
         for(int i = 0; i < 3; i++){
