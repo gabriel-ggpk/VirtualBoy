@@ -1,16 +1,21 @@
 #include <raylib.h>
-#include "fase2.c"
+
 #include "Boss.c"
+#include "fase2.c"
 #include "naveFase.c"
 #include "faseRunner.c"
+
 #define PHYSAC_IMPLEMENTATION
 #define PHYSAC_NO_THREADS
 #include "physac.h"
+
+
 int main(){
     int windowWidth = 1280, windowHeight = 720;
     int fase = 0;
 
     InitWindow(windowWidth, windowHeight, "Não temos um nome");
+    InitAudioDevice();
 
     SetTargetFPS(60);
     while(!WindowShouldClose()){
@@ -59,6 +64,7 @@ int main(){
         }
     }
 
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;
