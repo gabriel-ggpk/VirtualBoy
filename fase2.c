@@ -6,7 +6,7 @@
 const int larguraDaTela = 1280;
 const int AlturaDaTela = 720;
 
-typedef struct Player
+typedef struct
 {
     Texture2D txt;
     Rectangle rect;
@@ -36,7 +36,7 @@ int frames=0;
     int framecont = 0;
     int framespeed=12;
     int i = 0;
-    int random = 0;
+    int rando = 0;
     int randwidth = 0;
     int singleTile = 50;
     bool repetido = false;
@@ -93,7 +93,7 @@ tiles[z].rect.y = 2*tiles[z].txt.height/15;
         frames++;
         if(frames>=200){
         frames = 0;
-         random = GetRandomValue(-225,255);
+         rando = GetRandomValue(-225,255);
          randwidth = GetRandomValue(0,10);
          if(randwidth<3){
              randwidth = singleTile;
@@ -105,9 +105,9 @@ tiles[z].rect.y = 2*tiles[z].txt.height/15;
              randwidth = singleTile*3;
          }
 
-        tiles[i].body= CreatePhysicsBodyRectangle((Vector2){random,cameraJumper.target.y+100},randwidth,50,10);
+        tiles[i].body= CreatePhysicsBodyRectangle((Vector2){rando,cameraJumper.target.y+100},randwidth,50,10);
         tiles[i].body->enabled = false;
-        tiles[i].rect.x = random-(randwidth/2);    
+        tiles[i].rect.x = rando-(randwidth/2);    
         tiles[i].rect.y = cameraJumper.target.y-(50/2)+100;   
         tiles[i].rect.width = randwidth;  
         tiles[i].rect.height = 50; 

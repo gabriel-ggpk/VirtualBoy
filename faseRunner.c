@@ -40,10 +40,10 @@ void initGame(){
     InitPhysics();
     SetPhysicsGravity(0.0f, 1.1f);
 
-    ground.image = LoadTexture("assets/faserunner/ground.png");
+    ground.image = LoadTexture("assets/FaseRunner/ground.png");
     ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, GetScreenHeight() - (ground.image.height*1.5 - 18)}, 200000, 100, 10);
     ground.body->enabled = false;
-    background.image = LoadTexture("assets/faserunnerbg.png");
+    background.image = LoadTexture("assets/FaseRunner/bg.png");
 
     personagem.body = CreatePhysicsBodyRectangle((Vector2){400, GetScreenHeight() -ground.image.height*1.5 - 10}, 20, 28, 1);
     personagem.body->freezeOrient = true;
@@ -55,13 +55,13 @@ void initGame(){
     personagem.frame = 0;
 
     for(int i = 0; i < 3; i++){        
-        rock[i].texture = LoadTexture("assets/faserunner/rock.png");
+        rock[i].texture = LoadTexture("assets/FaseRunner/rock.png");
         rock[i].width = rock[i].texture.width * 2.5;
         rock[i].height = rock[i].texture.height * 2.5;
         rock[i].position.x = -100;
         rock[i].position.y = -100;
 
-        bird[i].texture = LoadTexture("assets/faserunner/bird.png");
+        bird[i].texture = LoadTexture("assets/FaseRunner/bird.png");
         bird[i].width = bird[i].texture.width/8; 
         bird[i].height = bird[i].texture.height/3;
         bird[i].frame = 0 + i * 3;
