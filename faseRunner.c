@@ -20,7 +20,7 @@ typedef struct {
     PhysicsBody body;
 }Assets;
 
-const int screenWidth = 800, screenHeight = 450;
+const int screenWidth = 1280, screenHeight = 720;
 float frames_counter, frames_countdown = 0, walking = 0, frame_spawn;
 int countdown = 3, timer = 121, frameline = 0, limit = 0;
 bool spawn_set = false, dead = false, down = false;
@@ -35,17 +35,17 @@ Assets background;
 
 void initGame(){
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    //SetWindowSize(screenWidth, screenHeight);
+    //InitWindow(screenWidth, screenHeight, "Janela");
     //ToggleFullscreen();
     InitPhysics();
     SetPhysicsGravity(0.0f, 1.1f);
 
-    ground.image = LoadTexture("assets/FaseRunner/ground.png");
-    ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, GetScreenHeight() -ground.image.height*1.5}, 200000, 100, 10);
+    ground.image = LoadTexture("assets/faserunner/ground.png");
+    ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, GetScreenHeight() - (ground.image.height*1.5 - 18)}, 200000, 100, 10);
     ground.body->enabled = false;
-    background.image = LoadTexture("assets/FaseRunner/bg.png");
+    background.image = LoadTexture("assets/faserunnerbg.png");
 
-    personagem.body = CreatePhysicsBodyRectangle((Vector2){400, GetScreenHeight() -ground.image.height*1.5}, 20, 28, 1);
+    personagem.body = CreatePhysicsBodyRectangle((Vector2){400, GetScreenHeight() -ground.image.height*1.5 - 10}, 20, 28, 1);
     personagem.body->freezeOrient = true;
     personagem.texture = LoadTexture("assets/full.png");
     //personagem.texture.width = personagem.texture.width*2;
@@ -55,13 +55,13 @@ void initGame(){
     personagem.frame = 0;
 
     for(int i = 0; i < 3; i++){        
-        rock[i].texture = LoadTexture("assets/FaseRunner/rock.png");
+        rock[i].texture = LoadTexture("assets/faserunner/rock.png");
         rock[i].width = rock[i].texture.width * 2.5;
         rock[i].height = rock[i].texture.height * 2.5;
         rock[i].position.x = -100;
         rock[i].position.y = -100;
 
-        bird[i].texture = LoadTexture("assets/FaseRunner/bird.png");
+        bird[i].texture = LoadTexture("assets/faserunner/bird.png");
         bird[i].width = bird[i].texture.width/8; 
         bird[i].height = bird[i].texture.height/3;
         bird[i].frame = 0 + i * 3;
@@ -136,8 +136,8 @@ void movimentacao(){
         }
     }
     if(timer > 0){
-        camera.target.x = personagem.body->position.x + 180;
-        camera.target.y = screenHeight - 170;
+        camera.target.x = personagem.body->position.x + 350;
+        camera.target.y = screenHeight - 320;
     }
 }
 
@@ -155,28 +155,28 @@ void spawn(){
         rand_spawn1 = GetRandomValue(1, 3);
 
         if(rand_spawn == 1){
-            bird[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -100 -personagem.height;
+            bird[0].position.x = personagem.body->position.x + GetScreenWidth() - 200;
+            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -80 -personagem.height;
             if(rand_spawn1 == 1){
                 bird[1].position.x = personagem.body->position.x + GetScreenWidth() -50;
-                bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -140 -personagem.height;
+                bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -120 -personagem.height;
             }
             else{
-                bird[2].position.x = personagem.body->position.x + GetScreenWidth() -50;
-                bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -60 -personagem.height;
+                bird[2].position.x = personagem.body->position.x + GetScreenWidth() - 50;
+                bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -40 -personagem.height;
                 if(rand_spawn1 == 3){
-                    rock[0].position.x = personagem.body->position.x +GetScreenWidth() -200;
+                    rock[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
                     rock[0].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
                 }
             }
         }
         else if(rand_spawn == 2){
             bird[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -100 -personagem.height;
+            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -80 -personagem.height;
             bird[1].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -140 -personagem.height;
+            bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -120 -personagem.height;
             bird[2].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -60 -personagem.height;
+            bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -40 -personagem.height;
         }
         else{
             rock[0].position.x = personagem.body->position.x +personagem.body->position.x +GetScreenWidth() -200;
@@ -233,6 +233,7 @@ void desenho(){
     personagem.rec = personagemrec;
 
     BeginDrawing();
+    ClearBackground(BLACK);
         BeginMode2D(camera);
 
         int ground_size = 100000/ground.image.width;
@@ -244,12 +245,11 @@ void desenho(){
         DrawTextureRec(
             personagem.texture,
             personagem.rec,
-            (Vector2){personagem.body->position.x, personagem.body->position.y},
+            (Vector2){personagem.body->position.x - 17, personagem.body->position.y - 17},
             RAYWHITE);
 
         for(int i = 0; i < 3; i++){
             DrawTextureEx(rock[i].texture, (Vector2){rock[i].position.x, rock[i].position.y}, 0.0f, 2.5f, RAYWHITE);
-            
             Rectangle birdrec = {bird[i].width * bird[i].frame, bird[i].height, bird[i].width, bird[i].height};
             bird[i].rec = birdrec;            
             DrawTextureRec(
@@ -258,6 +258,7 @@ void desenho(){
                 (Vector2){bird[i].position.x, bird[i].position.y},
                 RAYWHITE);   
         }
+        
         EndMode2D();
 
     if(countdown >= 0){
