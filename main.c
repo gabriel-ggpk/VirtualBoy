@@ -1,5 +1,5 @@
 #include <raylib.h>
-#include "fase2.c"
+//#include "fase2.c"
 #include "Boss.c"
 #include "naveFase.c"
 #include "faseRunner.c"
@@ -36,7 +36,7 @@ int main(){
             break;
 
            case 2:
-            if(Fase2() == 0)
+            if(IsKeyDown(KEY_ZERO) == 1)
                 fase = 0;
             break;
 
