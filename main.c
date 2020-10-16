@@ -1,5 +1,5 @@
 #include <raylib.h>
-
+#include "fase2.c"
 #include "Boss.c"
 #include "naveFase.c"
 #include "faseRunner.c"
@@ -36,12 +36,8 @@ int main(){
             break;
 
            case 2:
-            if(IsKeyPressed(KEY_ZERO))
+            if(Fase2() == 0)
                 fase = 0;
-            BeginDrawing();
-                DrawText("Aperte 0 para voltar", 150, windowHeight/2, 20, BLACK);
-                ClearBackground(BLUE);
-            EndDrawing();
             break;
 
            case 3:
