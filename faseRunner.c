@@ -144,53 +144,52 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 5 && timer >= 2 && !dead){
+    if(frame_spawn >= 3.25 && timer >= 2 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;
-            rand_spawn = GetRandomValue(1, 2);    
+            rand_spawn = GetRandomValue(1, 2);
         }
         else rand_spawn = GetRandomValue(1, 3);
-        
+
         rand_spawn1 = GetRandomValue(1, 3);
 
         if(rand_spawn == 1){
-            bird[0].position.x = personagem.body->position.x + GetScreenWidth() - 200;
-            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -80 -personagem.height;
+            bird[0].position.x = personagem.body->position.x + screenWidth - 200;
+            bird[0].position.y = screenHeight - ground.image.height*1.5 -80 -personagem.height;
             if(rand_spawn1 == 1){
-                bird[1].position.x = personagem.body->position.x + GetScreenWidth() -50;
-                bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -120 -personagem.height;
+                bird[1].position.x = personagem.body->position.x + screenWidth -50;
+                bird[1].position.y = screenHeight -ground.image.height*1.5 -120 -personagem.height;
             }
             else{
-                bird[2].position.x = personagem.body->position.x + GetScreenWidth() - 50;
-                bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -40 -personagem.height;
+                bird[2].position.x = personagem.body->position.x + screenWidth - 50;
+                bird[2].position.y = screenHeight -ground.image.height*1.5 -40 -personagem.height;
                 if(rand_spawn1 == 3){
-                    rock[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
-                    rock[0].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
+                    rock[0].position.x = personagem.body->position.x + screenWidth - 300;
+                    rock[0].position.y = screenHeight -ground.image.height*1.5 -personagem.height -rock[2].height;
                 }
             }
         }
         else if(rand_spawn == 2){
-            bird[0].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[0].position.y = GetScreenHeight() -ground.image.height*1.5 -80 -personagem.height;
-            bird[1].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[1].position.y = GetScreenHeight() -ground.image.height*1.5 -120 -personagem.height;
-            bird[2].position.x = personagem.body->position.x + GetScreenWidth() -200;
-            bird[2].position.y = GetScreenHeight() -ground.image.height*1.5 -40 -personagem.height;
+            bird[0].position.x = personagem.body->position.x + screenWidth -200;
+            bird[0].position.y = screenHeight -ground.image.height*1.5 -80 -personagem.height;
+            bird[1].position.x = personagem.body->position.x + screenWidth -200;
+            bird[1].position.y = screenHeight -ground.image.height*1.5 -120 -personagem.height;
+            bird[2].position.x = personagem.body->position.x + screenWidth -200;
+            bird[2].position.y = screenHeight -ground.image.height*1.5 -40 -personagem.height;
         }
         else{
-            rock[0].position.x = personagem.body->position.x +personagem.body->position.x +GetScreenWidth() -200;
-            rock[0].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
+            rock[0].position.x = personagem.body->position.x + screenWidth - 300;
+            rock[0].position.y = screenHeight -ground.image.height*1.5 -personagem.height -rock[2].height;
             if(rand_spawn1 == 1){
-                rock[1].position.x = personagem.body->position.x +GetScreenWidth() -80;
-                rock[1].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
+                rock[1].position.x = personagem.body->position.x +screenWidth;
+                rock[1].position.y = screenHeight -ground.image.height*1.5 -personagem.height -rock[2].height;
                 spawn_set = true;
-            }
-            if(rand_spawn1 == 2){
-                rock[1].position.x = personagem.body->position.x +GetScreenWidth() -80;
-                rock[1].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
-                rock[2].position.x = personagem.body->position.x +GetScreenWidth() -360;
-                rock[2].position.y = GetScreenHeight() -ground.image.height*1.5 -personagem.height -rock[2].height;
+            }else if(rand_spawn1 == 2){
+                rock[1].position.x = personagem.body->position.x + screenWidth;
+                rock[1].position.y = screenHeight -ground.image.height*1.5 -personagem.height -rock[2].height;
+                rock[2].position.x = personagem.body->position.x + screenWidth + 300;
+                rock[2].position.y = screenHeight -ground.image.height*1.5 -personagem.height -rock[2].height;
                 spawn_set = true;
             }
         }
