@@ -1,9 +1,11 @@
 #include <raylib.h>
-//#include "fase2.c"
+#include "fase2.c"
 #include "Boss.c"
 #include "naveFase.c"
 #include "faseRunner.c"
-
+#define PHYSAC_IMPLEMENTATION
+#define PHYSAC_NO_THREADS
+#include "physac.h"
 int main(){
     int windowWidth = 1280, windowHeight = 720;
     int fase = 0;
@@ -36,7 +38,7 @@ int main(){
             break;
 
            case 2:
-            if(IsKeyDown(KEY_ZERO) == 1)
+            if(Fase2() == 0)
                 fase = 0;
             break;
 
