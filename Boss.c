@@ -39,6 +39,9 @@ typedef struct{
     Texture2D layer3;
     Texture2D layer4;
     Texture2D layer5;
+    Texture2D layer6;
+    Texture2D layer7;
+    Texture2D layer8;
 }Fundo;
 typedef struct{
     Texture2D image;
@@ -56,6 +59,13 @@ int lasersAtivos = 1;
 int canhaoAtiva = 0;
 
 //partes da sala base
+Fundo Back;
+Rectangle arvore1;
+Rectangle arvore2;
+Rectangle plataformaChao;
+Rectangle plataformaAr;
+Rectangle placa;
+
 Imagem assets;
 Rectangle tetoLinha;
 Rectangle tetoColuna;
@@ -70,6 +80,9 @@ Rectangle paredeComputadorDir;
 Rectangle paredeComputadorEsc;
 
 //funções
+//cenario
+void drawFundo();
+void animaFundo();
 //sala base do jogo
 void inicializarSala(Texture2D cena);
 void drawSala();
@@ -124,11 +137,14 @@ int BOSS(){
     UnloadTexture(armaLaserDir.imagem);
     UnloadTexture(armaCanhao.imagemArma);
     UnloadTexture(armaCanhao.imagemTiro);
-    UnloadTexture(fundo.layer1);
-    UnloadTexture(fundo.layer2);
-    UnloadTexture(fundo.layer3);
-    UnloadTexture(fundo.layer4);
-    UnloadTexture(fundo.layer5);
+    UnloadTexture(Back.layer1);
+    UnloadTexture(Back.layer2);
+    UnloadTexture(Back.layer3);
+    UnloadTexture(Back.layer4);
+    UnloadTexture(Back.layer5);
+    UnloadTexture(Back.layer6);
+    UnloadTexture(Back.layer7);
+    UnloadTexture(Back.layer8);
 
     return resultado4;
 }
@@ -158,7 +174,7 @@ void inicializarNivelBoss(){
     computador.frameRec.x = computador.frameRec.width*0;
     computador.frameRec.y = computador.frameRec.height*2;
     computador.posi.x = (GetScreenWidth()/2) - chao.width*1.5;
-    computador.posi.y = chao.height*4;
+    computador.posi.y = chao.height*6;
     computador.colisao.width = computador.frameRec.width - 32;
     computador.colisao.height = computador.frameRec.height/1.5;
     computador.colisao.x = computador.posi.x + 16;
@@ -171,8 +187,8 @@ void inicializarNivelBoss(){
     armaLaserDir.frameRec.height = armaLaserDir.imagem.height/32;
     armaLaserDir.frameRec.x = armaLaserDir.frameRec.width*2;
     armaLaserDir.frameRec.y = armaLaserDir.frameRec.height*16;
-    armaLaserDir.posi.x = GetScreenWidth()/2 + 205;
-    armaLaserDir.posi.y = chao.height*6 - 32;
+    armaLaserDir.posi.x = GetScreenWidth()/2 + 333;
+    armaLaserDir.posi.y = chao.height*8;
     armaLaserDir.atirar = 0;
     armaLaserDir.vel = 2;
     armaLaserDir.tiroVel = 18;
@@ -183,8 +199,8 @@ void inicializarNivelBoss(){
     armaLaserEsc.frameRec.height = armaLaserDir.imagem.height/32;
     armaLaserEsc.frameRec.x = 0;
     armaLaserEsc.frameRec.y = armaLaserDir.frameRec.height*0;
-    armaLaserEsc.posi.x = (GetScreenWidth()-tetoLinha.width*17)/2;
-    armaLaserEsc.posi.y = chao.height*13 + 4;
+    armaLaserEsc.posi.x = (GetScreenWidth()-tetoLinha.width*25)/2;
+    armaLaserEsc.posi.y = chao.height*17 + 4;
     armaLaserEsc.atirar = 0;
     armaLaserEsc.vel = 1.8;
     armaLaserEsc.tiroVel = 20;
@@ -203,25 +219,58 @@ void inicializarNivelBoss(){
     armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
     armaCanhao.frameRec.y = 0;
     armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-    armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*1.8);
+    armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*4.8);
 
-    fundo.layer1 = LoadTexture("assets/Boss/backGround1.png");
-    fundo.layer1.width = GetScreenWidth();
-    fundo.layer1.height = GetScreenHeight();
-    fundo.layer2 = LoadTexture("assets/Boss/backGround2.png");
-    fundo.layer2.width = fundo.layer2.width*3;
-    fundo.layer2.height = fundo.layer2.height*3;
-    fundo.layer3 = LoadTexture("assets/Boss/backGround3.png");
-    fundo.layer3.width = fundo.layer3.width*3.5;
-    fundo.layer3.height = fundo.layer3.height*3.5;
-    fundo.layer4 = LoadTexture("assets/Boss/backGround4.png");
-    fundo.layer4.width = fundo.layer4.width*3;
-    fundo.layer4.height = fundo.layer4.height*3;
-    fundo.layer5 = LoadTexture("assets/Boss/backGround5.png");
-    fundo.layer5.width = GetScreenWidth();
-    fundo.layer5.height = GetScreenHeight();
+    Back.layer1 = LoadTexture("assets/Boss/Clouds_01.png");
+    Back.layer1.width = GetScreenWidth();
+    Back.layer1.height = Back.layer1.height*3;
+    Back.layer2 = LoadTexture("assets/Boss/Clouds_02.png");
+    Back.layer2.width = GetScreenWidth();
+    Back.layer2.height = Back.layer2.height*3;
+    Back.layer3 = LoadTexture("assets/Boss/Grass.png");
+    Back.layer3.width = Back.layer3.width*2;
+    Back.layer3.height = Back.layer3.height*2;
+    Back.layer7 = LoadTexture("assets/Boss/Placa1.png");
+    Back.layer7.width = Back.layer7.width*3;
+    Back.layer7.height = Back.layer7.height*3;
+    placa.width = Back.layer7.width/8;
+    placa.height = Back.layer7.height;
+    placa.x = placa.width*0;
+    placa.y = 0;
+
+    Back.layer4 = LoadTexture("assets/Boss/tree.png");
+    Back.layer4.width = Back.layer4.width*3;
+    Back.layer4.height = Back.layer4.height*3;
+    arvore1.width = Back.layer4.width/8;
+    arvore1.height = Back.layer4.height;
+    arvore1.x = arvore1.width*0;
+    arvore1.y = 0;
+    Back.layer8 = LoadTexture("assets/Boss/tree2.png");
+    Back.layer8.width = Back.layer8.width*3;
+    Back.layer8.height = Back.layer8.height*3;
+    arvore2.width = Back.layer8.width/8;
+    arvore2.height = Back.layer8.height;
+    arvore2.x = arvore2.width*0;
+    arvore2.y = 0;
+
+    Back.layer5 = LoadTexture("assets/Boss/PlataformaChao.png");
+    Back.layer5.width = Back.layer5.width*3;
+    Back.layer5.height = Back.layer5.height*3;
+    plataformaChao.width = Back.layer5.width/8;
+    plataformaChao.height = Back.layer5.height;
+    plataformaChao.x = plataformaChao.width*0;
+    plataformaChao.y = 0;
+    Back.layer6 = LoadTexture("assets/Boss/PlataformaAr.png");
+    Back.layer6.width = Back.layer6.width*3;
+    Back.layer6.height = Back.layer6.height*3;
+    plataformaAr.width = Back.layer6.width/8;
+    plataformaAr.height = Back.layer6.height;
+    plataformaAr.x = plataformaAr.width*0;
+    plataformaAr.y = 0;
 }
 void atualizarNivelBoss(){
+    animaFundo();
+
     animaPersonagem();
 
     animaLaser();
@@ -250,24 +299,15 @@ void atualizarNivelBoss(){
 }
 void drawNivelBoss(){
     BeginDrawing();
-        DrawTexture(fundo.layer1, 0, 0, RAYWHITE);
-        DrawTexture(fundo.layer2, (GetScreenWidth()/1.5), (GetScreenHeight()/2), RAYWHITE);
-        DrawTexture(fundo.layer3, 0, 0, RAYWHITE);
-        DrawTexture(fundo.layer4, (GetScreenWidth()/5), (GetScreenHeight()/2), RAYWHITE);
+        drawFundo();
 
-        
         drawSala();
         DrawTextureRec(computador.imagem, computador.frameRec, computador.posi, RAYWHITE);
-
-        //DrawRectangle(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, YELLOW);
         DrawTextureRec(virtualGuy.imagem, virtualGuy.frameRec, virtualGuy.posi, RAYWHITE);
-
         drawLaser();
-
-        DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*4), RAYWHITE);
+        DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*7), RAYWHITE);
         DrawTextureRec(armaCanhao.imagemTiro, armaCanhao.frameRec, armaCanhao.posi, GREEN);
         
-        DrawTexture(fundo.layer5, 0, 0, RAYWHITE);
         //DrawRectangleLines(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, BLUE);
         //DrawCircleLines(armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2), 10.0, RED);
     EndDrawing();
@@ -288,7 +328,7 @@ void rotinaJogo(){
                 armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
                 armaCanhao.frameRec.y = 0;
                 armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*1.8);
+                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*4.8);
             }
             if(frameAtual == 2){
                 canhaoAtiva = 1;
@@ -313,7 +353,7 @@ void atualizarPersonagem(){
         virtualGuy.dano--;
 
     if(IsKeyDown(KEY_UP)){
-        if(virtualGuy.posi.y > chao.height*6){
+        if(virtualGuy.posi.y > chao.height*8){
             virtualGuy.posi.y -= virtualGuy.vel;
         }
         if(virtualGuy.dano <= 0){     
@@ -326,7 +366,7 @@ void atualizarPersonagem(){
         }
     }
     if(IsKeyDown(KEY_DOWN)){
-        if(virtualGuy.posi.y < chao.height*13){
+        if(virtualGuy.posi.y < chao.height*17){
             virtualGuy.posi.y += virtualGuy.vel;
         }
         if(virtualGuy.dano <= 0){ 
@@ -340,7 +380,7 @@ void atualizarPersonagem(){
     }
     if(IsKeyDown(KEY_LEFT)){
         virtualGuy.lado = -1;
-        if(virtualGuy.posi.x > (GetScreenWidth()-tetoLinha.width*17)/2 -10){
+        if(virtualGuy.posi.x > (GetScreenWidth()-tetoLinha.width*25)/2 -10){
             virtualGuy.posi.x -= virtualGuy.vel;
         } 
         if(virtualGuy.dano <= 0){     
@@ -352,7 +392,7 @@ void atualizarPersonagem(){
     }
     if(IsKeyDown(KEY_RIGHT)){
         virtualGuy.lado = 1;
-        if(virtualGuy.posi.x < GetScreenWidth()/2 + 216){
+        if(virtualGuy.posi.x < GetScreenWidth()/2 + 344){
             virtualGuy.posi.x += virtualGuy.vel;
         }
         if(virtualGuy.dano <= 0){ 
@@ -503,16 +543,16 @@ void drawLaser(){
     armaLaserEscFim.y = armaLaserEsc.frameRec.y;
 
     DrawTextureRec(armaLaserDir.imagem, armaLaserEsc.frameRec, armaLaserEsc.posi, RAYWHITE);
-    for(int i = 0; i < 6; i++){
+    for(int i = 0; i < 10; i++){
         DrawTextureRec(armaLaserDir.imagem, armaLaserEscMeio, (Vector2){armaLaserEsc.posi.x + armaLaserEsc.frameRec.width*(i+1), armaLaserEsc.posi.y}, RAYWHITE);
     }
-    DrawTextureRec(armaLaserDir.imagem, armaLaserEscFim, (Vector2){armaLaserEsc.posi.x + armaLaserEsc.frameRec.width*7, armaLaserEsc.posi.y}, RAYWHITE);
+    DrawTextureRec(armaLaserDir.imagem, armaLaserEscFim, (Vector2){armaLaserEsc.posi.x + armaLaserEsc.frameRec.width*10.7, armaLaserEsc.posi.y}, RAYWHITE);
 
     DrawTextureRec(armaLaserDir.imagem, armaLaserDir.frameRec, armaLaserDir.posi, RAYWHITE);
-    for(int i = 0; i < 6; i++){
+    for(int i = 0; i < 10; i++){
         DrawTextureRec(armaLaserDir.imagem, armaLaserDirMeio, (Vector2){armaLaserDir.posi.x - armaLaserDir.frameRec.width*(i+1), armaLaserDir.posi.y}, RAYWHITE);
     }
-    DrawTextureRec(armaLaserDir.imagem, armaLaserDirFim, (Vector2){armaLaserDir.posi.x - armaLaserDir.frameRec.width*7, armaLaserDir.posi.y}, RAYWHITE);
+    DrawTextureRec(armaLaserDir.imagem, armaLaserDirFim, (Vector2){armaLaserDir.posi.x - armaLaserDir.frameRec.width*10.7, armaLaserDir.posi.y}, RAYWHITE);
 }
 void animaLaser(){
     static int frameAtualEsc = 0;
@@ -612,7 +652,7 @@ void moveLaser(){
             armaLaserDir.posi.y += armaLaserDir.vel;
         }
 
-        if(armaLaserDir.posi.y >= chao.height*14 + 4){
+        if(armaLaserDir.posi.y >= chao.height*17 + 4){
             directionLaserDir = -1;
         }
     }
@@ -620,7 +660,7 @@ void moveLaser(){
         if(pararLaserDir == 0){
             armaLaserDir.posi.y -= armaLaserDir.vel;
         }
-        if(armaLaserDir.posi.y <= chao.height*6){
+        if(armaLaserDir.posi.y <= chao.height*8){
             directionLaserDir = 1;
         }
     }
@@ -630,7 +670,7 @@ void moveLaser(){
             armaLaserEsc.posi.y += armaLaserEsc.vel;
         }
 
-        if(armaLaserEsc.posi.y >= chao.height*14 + 4){
+        if(armaLaserEsc.posi.y >= chao.height*17 + 4){
             directionLaserEsc = -1;
         }
     }
@@ -638,7 +678,7 @@ void moveLaser(){
         if(pararLaserEsc == 0){
             armaLaserEsc.posi.y -= armaLaserEsc.vel;
         }
-        if(armaLaserEsc.posi.y <= chao.height*6){
+        if(armaLaserEsc.posi.y <= chao.height*8){
             directionLaserEsc = 1;
         }
     }
@@ -684,19 +724,19 @@ void atiraCanhao(){
         armaCanhao.posi.y += B;
 
         
-        if(armaCanhao.posi.x > (GetScreenWidth()/2) + chao.width*7){
+        if(armaCanhao.posi.x > (GetScreenWidth()/2) + chao.width*11){
             canhaoAtiva = 0;
             armaCanhao.explodir = 1;
         }
-        if(armaCanhao.posi.x < (GetScreenWidth()/2) - chao.width*10){
+        if(armaCanhao.posi.x < (GetScreenWidth()/2) - chao.width*14){
             canhaoAtiva = 0;
             armaCanhao.explodir = 1;
         }
-        if(armaCanhao.posi.y < chao.height*4.5){
+        if(armaCanhao.posi.y < chao.height*6.5){
             canhaoAtiva = 0;
             armaCanhao.explodir = 1;
         }
-        if(armaCanhao.posi.y > chao.height*14){
+        if(armaCanhao.posi.y > chao.height*17){
             canhaoAtiva = 0;
             armaCanhao.explodir = 1;
         } 
@@ -750,36 +790,147 @@ void inicializarSala(Texture2D cena){
     paredeComputadorEsc.height = assets.image.height/17;
     paredeComputadorEsc.x = paredeComputadorEsc.width*3;
     paredeComputadorEsc.y = paredeComputadorEsc.height*0;
-
 }
 void drawSala(){
-    int comeX = (GetScreenWidth()-tetoLinha.width*17)/2;
-    int comeY = tetoLinha.height*3;
+    int comeX = (GetScreenWidth()-tetoLinha.width*25)/2;
+    int comeY = tetoLinha.height*4;
 
-    for(int i = 0; i < 17; i++)
+    for(int i = 0; i < 25; i++)
         DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY}, RAYWHITE);
-    for(int i = 0; i < 17; i++)
-        DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY + tetoLinha.height*13}, RAYWHITE);
-    for(int j = 0; j < 12; j++)
+    for(int i = 0; i < 25; i++)
+        DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY + tetoLinha.height*15}, RAYWHITE);
+    for(int j = 0; j < 14; j++)
         DrawTextureRec(assets.image, tetoColuna, (Vector2){comeX - tetoColuna.width, comeY + tetoColuna.height*(j+1)}, RAYWHITE);
-    for(int j = 0; j < 12; j++)
-        DrawTextureRec(assets.image, tetoColuna, (Vector2){comeX + tetoColuna.width*17, comeY + tetoColuna.height*(j+1)}, RAYWHITE);
+    for(int j = 0; j < 14; j++)
+        DrawTextureRec(assets.image, tetoColuna, (Vector2){comeX + tetoColuna.width*25, comeY + tetoColuna.height*(j+1)}, RAYWHITE);
     
     DrawTextureRec(assets.image, tetoQuina1, (Vector2){comeX - tetoQuina1.width, comeY}, RAYWHITE);
-    DrawTextureRec(assets.image, tetoQuina2, (Vector2){comeX + tetoQuina2.width*17, comeY}, RAYWHITE);
-    DrawTextureRec(assets.image, tetoQuina3, (Vector2){comeX - tetoQuina3.width, comeY + tetoQuina3.height*13}, RAYWHITE);
-    DrawTextureRec(assets.image, tetoQuina4, (Vector2){comeX + tetoQuina4.width*17, comeY + tetoQuina4.height*13}, RAYWHITE);
+    DrawTextureRec(assets.image, tetoQuina2, (Vector2){comeX + tetoQuina2.width*25, comeY}, RAYWHITE);
+    DrawTextureRec(assets.image, tetoQuina3, (Vector2){comeX - tetoQuina3.width, comeY + tetoQuina3.height*15}, RAYWHITE);
+    DrawTextureRec(assets.image, tetoQuina4, (Vector2){comeX + tetoQuina4.width*25, comeY + tetoQuina4.height*15}, RAYWHITE);
 
-    for(int j = 0; j < 9; j++){
-        for(int i = 0; i < 17; i++){
-            DrawTextureRec(assets.image, chao, (Vector2){comeX + chao.width*i, comeY + chao.height*(j + 4)}, RAYWHITE);
+    for(int j = 0; j < 10; j++){
+        for(int i = 0; i < 25; i++){
+            DrawTextureRec(assets.image, chao, (Vector2){comeX + chao.width*i, comeY + chao.height*(j + 5)}, RAYWHITE);
         }
     }
-    for(int j = 0; j < 3; j++){
-        for(int i = 0; i < 17; i++){
+    for(int j = 0; j < 4; j++){
+        for(int i = 0; i < 25; i++){
             DrawTextureRec(assets.image, parede, (Vector2){comeX + parede.width*i, comeY + parede.height*(j + 1)}, RAYWHITE);
         }
     }
-    DrawTextureRec(assets.image, paredeComputadorEsc, (Vector2){comeX + paredeComputadorEsc.width*7, comeY + paredeComputadorEsc.height}, RAYWHITE);
-    DrawTextureRec(assets.image, paredeComputadorDir, (Vector2){comeX + paredeComputadorDir.width*9, comeY + paredeComputadorDir.height}, RAYWHITE);
+
+    DrawTextureRec(assets.image, paredeComputadorEsc, (Vector2){comeX + paredeComputadorEsc.width*11, comeY + paredeComputadorEsc.height*2}, RAYWHITE);
+    DrawTextureRec(assets.image, paredeComputadorDir, (Vector2){comeX + paredeComputadorDir.width*13, comeY + paredeComputadorDir.height*2}, RAYWHITE);
+}
+
+//Background
+void drawFundo(){
+    ClearBackground((Color){102, 191, 205});
+    DrawRectangle(0, GetScreenHeight()/2 -chao.height*2, GetScreenWidth(), GetScreenHeight(), DARKGRAY);
+
+    DrawTexture(Back.layer1, 0, 68, RAYWHITE);
+    DrawTexture(Back.layer2, 0, 35, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*0, 0, 64, 64}, (Vector2){50, 300}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*1, 0, 64, 64}, (Vector2){120, 500}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*2, 0, 64, 64}, (Vector2){10, 640}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*3, 0, 64, 64}, (Vector2){620, 680}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*4, 0, 64, 64}, (Vector2){1120, 400}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*5, 0, 64, 64}, (Vector2){820, 620}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*6, 0, 64, 64}, (Vector2){1220, 350}, RAYWHITE);
+    DrawTextureRec(Back.layer3, (Rectangle){64*7, 0, 64, 64}, (Vector2){1070, 550}, RAYWHITE);
+
+    DrawTextureRec(Back.layer5, plataformaChao, (Vector2){1050, 100}, RAYWHITE);
+    DrawTextureRec(Back.layer6, plataformaAr, (Vector2){50, -10}, RAYWHITE);
+
+    DrawTextureRec(Back.layer7, placa, (Vector2){1050, 52}, RAYWHITE);
+
+    DrawTextureRec(Back.layer4, arvore1, (Vector2){100, 170}, RAYWHITE);
+    DrawTextureRec(Back.layer8, arvore2, (Vector2){20, 400}, RAYWHITE);
+    DrawTextureRec(Back.layer4, arvore1, (Vector2){1200, 500}, RAYWHITE);
+}
+void animaFundo(){
+    static int frameCont1  = 0;
+    static int frameAtual1  = 0;
+    frameCont1++;
+    if (frameCont1 >= 60/5){
+        frameCont1 = 0;
+        frameAtual1++;
+        if(frameAtual1 > 7){
+            frameAtual1 = 0;
+        }
+        arvore1.x = arvore1.width*frameAtual1;
+    }
+    static int frameCont2  = 0;
+    static int frameAtual2  = 0;
+    frameCont2++;
+    if (frameCont2 >= 60/5){
+        frameCont2 = 0;
+        frameAtual2++;
+        if(frameAtual2 > 7){
+            frameAtual2 = 0;
+        }
+        arvore2.x = arvore2.width*frameAtual1;
+    }
+    static int frameContAviso  = 0;
+    static int frameAtualAviso  = 0;
+    frameContAviso++;
+    if (frameContAviso >= 60/20){
+        frameContAviso = 0;
+        frameAtualAviso++;
+        if(frameAtualAviso > 7){
+            frameAtualAviso = 0;
+        }
+        placa.x = placa.width*frameAtual1;
+    }
+
+
+    static int cont1  = 0;
+    static int frameCont3  = 0;
+    static int frameAtual3  = 0;
+    frameCont3++;
+    if (frameCont3 >= 60/10){
+        frameCont3 = 0;
+
+        if(cont1 == 0){
+            frameAtual3++;
+            if(frameAtual3 > 6){
+                cont1 = 1;
+            }
+        }
+        else if(cont1 == 100){
+            frameAtual3--;
+            if(frameAtual3 == 0){
+                cont1 = -100;
+            } 
+        }
+        else{
+            cont1++;
+        }
+        plataformaChao.x = plataformaChao.width*frameAtual3;
+    }
+    static int cont2  = 0;
+    static int frameCont4  = 0;
+    static int frameAtual4  = 0;
+    frameCont4++;
+    if (frameCont4 >= 60/10){
+        frameCont4 = 0;
+
+        if(cont2 == 0){
+            frameAtual4++;
+            if(frameAtual4 > 6){
+                cont2 = 1;
+            }
+        }
+        else if(cont2 == 200){
+            frameAtual4--;
+            if(frameAtual4 == 0){
+                cont2 = -200;
+            } 
+        }
+        else{
+            cont2++;
+        }
+        plataformaAr.x = plataformaAr.width*frameAtual3;
+    }
 }
