@@ -34,6 +34,13 @@ typedef struct{
     int explodir;
 }canhao;
 typedef struct{
+    Texture2D layer1;
+    Texture2D layer2;
+    Texture2D layer3;
+    Texture2D layer4;
+    Texture2D layer5;
+}Fundo;
+typedef struct{
     Texture2D image;
 }Imagem;
 
@@ -43,8 +50,9 @@ chefe computador;
 laser armaLaserDir;
 laser armaLaserEsc;
 canhao armaCanhao;
+Fundo fundo;
 
-int lasersAtivos = 0;
+int lasersAtivos = 1;
 int canhaoAtiva = 0;
 
 //partes da sala base
@@ -89,27 +97,10 @@ int BOSS(){
     Texture2D Industri = LoadTexture("assets/Boss/Industrial.png");
     Industri.width = Industri.width*2;
     Industri.height = Industri.height*2;
-    Texture2D VirtualGuy = LoadTexture("assets/full.png");
-    VirtualGuy.width = VirtualGuy.width*2;
-    VirtualGuy.height = VirtualGuy.height*2;
-    virtualGuy.imagem = VirtualGuy;
     Texture2D Computador = LoadTexture("assets/Boss/PC.png");
     Computador.width = Computador.width*6.4;
     Computador.height = Computador.height*6.4;
     computador.imagem = Computador;
-    Texture2D Laser = LoadTexture("assets/Boss/laser.png");
-    Laser.width = Laser.width*4;
-    Laser.height = Laser.height*4;
-    armaLaserDir.imagem = Laser;
-    Texture2D Canhao = LoadTexture("assets/Boss/canhao.png");
-    Canhao.width = Canhao.width*2;
-    Canhao.height = Canhao.height*2;
-    armaCanhao.imagemArma = Canhao;
-    Texture2D Tiro = LoadTexture("assets/Boss/tudo.png");
-    Tiro.width = Tiro.width*2;
-    Tiro.height = Tiro.height*2;
-    armaCanhao.imagemTiro = Tiro;
-    
 
     inicializarSala(Industri);
     inicializarNivelBoss();
@@ -128,16 +119,25 @@ int BOSS(){
     }
 
     UnloadTexture(Industri);
-    UnloadTexture(VirtualGuy);
+    UnloadTexture(virtualGuy.imagem);
     UnloadTexture(Computador);
-    UnloadTexture(Laser);
-    UnloadTexture(Canhao);
-    UnloadTexture(Tiro);
+    UnloadTexture(armaLaserDir.imagem);
+    UnloadTexture(armaCanhao.imagemArma);
+    UnloadTexture(armaCanhao.imagemTiro);
+    UnloadTexture(fundo.layer1);
+    UnloadTexture(fundo.layer2);
+    UnloadTexture(fundo.layer3);
+    UnloadTexture(fundo.layer4);
+    UnloadTexture(fundo.layer5);
+
     return resultado4;
 }
 
 
 void inicializarNivelBoss(){
+    virtualGuy.imagem = LoadTexture("assets/full.png");
+    virtualGuy.imagem.width = virtualGuy.imagem.width*2;
+    virtualGuy.imagem.height = virtualGuy.imagem.height*2;
     virtualGuy.frameRec.width = virtualGuy.imagem.width/12;
     virtualGuy.frameRec.height = virtualGuy.imagem.height/14;
     virtualGuy.frameRec.x = virtualGuy.frameRec.width*0;
@@ -164,6 +164,9 @@ void inicializarNivelBoss(){
     computador.colisao.x = computador.posi.x + 16;
     computador.colisao.y = computador.posi.y;
 
+    armaLaserDir.imagem = LoadTexture("assets/Boss/laser.png");
+    armaLaserDir.imagem.width = armaLaserDir.imagem.width*4;
+    armaLaserDir.imagem.height = armaLaserDir.imagem.height*4;
     armaLaserDir.frameRec.width = armaLaserDir.imagem.width/3;
     armaLaserDir.frameRec.height = armaLaserDir.imagem.height/32;
     armaLaserDir.frameRec.x = armaLaserDir.frameRec.width*2;
@@ -181,7 +184,7 @@ void inicializarNivelBoss(){
     armaLaserEsc.frameRec.x = 0;
     armaLaserEsc.frameRec.y = armaLaserDir.frameRec.height*0;
     armaLaserEsc.posi.x = (GetScreenWidth()-tetoLinha.width*17)/2;
-    armaLaserEsc.posi.y = chao.height*12 + 4;
+    armaLaserEsc.posi.y = chao.height*13 + 4;
     armaLaserEsc.atirar = 0;
     armaLaserEsc.vel = 1.8;
     armaLaserEsc.tiroVel = 20;
@@ -189,12 +192,34 @@ void inicializarNivelBoss(){
     armaLaserEsc.colisao.height = 32;
     armaLaserEsc.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
 
+    armaCanhao.imagemArma = LoadTexture("assets/Boss/canhao.png");
+    armaCanhao.imagemArma.width = armaCanhao.imagemArma.width*2;
+    armaCanhao.imagemArma.height = armaCanhao.imagemArma.height*2;
+    armaCanhao.imagemTiro = LoadTexture("assets/Boss/tudo.png");
+    armaCanhao.imagemTiro.width = armaCanhao.imagemTiro.width*2;
+    armaCanhao.imagemTiro.height = armaCanhao.imagemTiro.height*2;
     armaCanhao.frameRec.width = armaCanhao.imagemTiro.width/11;
     armaCanhao.frameRec.height = armaCanhao.imagemTiro.height;
     armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
     armaCanhao.frameRec.y = 0;
     armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-    armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*0.8);
+    armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*1.8);
+
+    fundo.layer1 = LoadTexture("assets/Boss/backGround1.png");
+    fundo.layer1.width = GetScreenWidth();
+    fundo.layer1.height = GetScreenHeight();
+    fundo.layer2 = LoadTexture("assets/Boss/backGround2.png");
+    fundo.layer2.width = fundo.layer2.width*3;
+    fundo.layer2.height = fundo.layer2.height*3;
+    fundo.layer3 = LoadTexture("assets/Boss/backGround3.png");
+    fundo.layer3.width = fundo.layer3.width*3.5;
+    fundo.layer3.height = fundo.layer3.height*3.5;
+    fundo.layer4 = LoadTexture("assets/Boss/backGround4.png");
+    fundo.layer4.width = fundo.layer4.width*3;
+    fundo.layer4.height = fundo.layer4.height*3;
+    fundo.layer5 = LoadTexture("assets/Boss/backGround5.png");
+    fundo.layer5.width = GetScreenWidth();
+    fundo.layer5.height = GetScreenHeight();
 }
 void atualizarNivelBoss(){
     animaPersonagem();
@@ -225,7 +250,12 @@ void atualizarNivelBoss(){
 }
 void drawNivelBoss(){
     BeginDrawing();
-        ClearBackground(GREEN);
+        DrawTexture(fundo.layer1, 0, 0, RAYWHITE);
+        DrawTexture(fundo.layer2, (GetScreenWidth()/1.5), (GetScreenHeight()/2), RAYWHITE);
+        DrawTexture(fundo.layer3, 0, 0, RAYWHITE);
+        DrawTexture(fundo.layer4, (GetScreenWidth()/5), (GetScreenHeight()/2), RAYWHITE);
+
+        
         drawSala();
         DrawTextureRec(computador.imagem, computador.frameRec, computador.posi, RAYWHITE);
 
@@ -234,9 +264,10 @@ void drawNivelBoss(){
 
         drawLaser();
 
-        DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*3), RAYWHITE);
+        DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*4), RAYWHITE);
         DrawTextureRec(armaCanhao.imagemTiro, armaCanhao.frameRec, armaCanhao.posi, GREEN);
-
+        
+        DrawTexture(fundo.layer5, 0, 0, RAYWHITE);
         //DrawRectangleLines(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, BLUE);
         //DrawCircleLines(armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2), 10.0, RED);
     EndDrawing();
@@ -247,7 +278,7 @@ void rotinaJogo(){
     static int frameCont  = 0;
     static int frameAtual  = 0;
 
-    if(armaCanhao.explodir == 0){
+    if(canhaoAtiva == 0){
         frameCont++;
         if (frameCont >= 60){
             frameCont = 0;
@@ -257,7 +288,7 @@ void rotinaJogo(){
                 armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
                 armaCanhao.frameRec.y = 0;
                 armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*0.8);
+                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*1.8);
             }
             if(frameAtual == 2){
                 canhaoAtiva = 1;
@@ -581,7 +612,7 @@ void moveLaser(){
             armaLaserDir.posi.y += armaLaserDir.vel;
         }
 
-        if(armaLaserDir.posi.y >= chao.height*13 + 4){
+        if(armaLaserDir.posi.y >= chao.height*14 + 4){
             directionLaserDir = -1;
         }
     }
@@ -599,7 +630,7 @@ void moveLaser(){
             armaLaserEsc.posi.y += armaLaserEsc.vel;
         }
 
-        if(armaLaserEsc.posi.y >= chao.height*13 + 4){
+        if(armaLaserEsc.posi.y >= chao.height*14 + 4){
             directionLaserEsc = -1;
         }
     }
@@ -728,18 +759,18 @@ void drawSala(){
     for(int i = 0; i < 17; i++)
         DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY}, RAYWHITE);
     for(int i = 0; i < 17; i++)
-        DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY + tetoLinha.height*12}, RAYWHITE);
-    for(int j = 0; j < 11; j++)
+        DrawTextureRec(assets.image, tetoLinha, (Vector2){comeX + tetoLinha.width*i, comeY + tetoLinha.height*13}, RAYWHITE);
+    for(int j = 0; j < 12; j++)
         DrawTextureRec(assets.image, tetoColuna, (Vector2){comeX - tetoColuna.width, comeY + tetoColuna.height*(j+1)}, RAYWHITE);
-    for(int j = 0; j < 11; j++)
+    for(int j = 0; j < 12; j++)
         DrawTextureRec(assets.image, tetoColuna, (Vector2){comeX + tetoColuna.width*17, comeY + tetoColuna.height*(j+1)}, RAYWHITE);
     
     DrawTextureRec(assets.image, tetoQuina1, (Vector2){comeX - tetoQuina1.width, comeY}, RAYWHITE);
     DrawTextureRec(assets.image, tetoQuina2, (Vector2){comeX + tetoQuina2.width*17, comeY}, RAYWHITE);
-    DrawTextureRec(assets.image, tetoQuina3, (Vector2){comeX - tetoQuina3.width, comeY + tetoQuina3.height*12}, RAYWHITE);
-    DrawTextureRec(assets.image, tetoQuina4, (Vector2){comeX + tetoQuina4.width*17, comeY + tetoQuina4.height*12}, RAYWHITE);
+    DrawTextureRec(assets.image, tetoQuina3, (Vector2){comeX - tetoQuina3.width, comeY + tetoQuina3.height*13}, RAYWHITE);
+    DrawTextureRec(assets.image, tetoQuina4, (Vector2){comeX + tetoQuina4.width*17, comeY + tetoQuina4.height*13}, RAYWHITE);
 
-    for(int j = 0; j < 8; j++){
+    for(int j = 0; j < 9; j++){
         for(int i = 0; i < 17; i++){
             DrawTextureRec(assets.image, chao, (Vector2){comeX + chao.width*i, comeY + chao.height*(j + 4)}, RAYWHITE);
         }
