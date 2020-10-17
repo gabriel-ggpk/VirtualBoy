@@ -6,7 +6,7 @@ typedef struct
     Rectangle rect;
     Vector2 FundoLocal;
     Color Cor;
-} Fundo;
+} Espaco;
 
 //Define struct do jogador.
 typedef struct 
@@ -61,7 +61,7 @@ static int Movimento = 2;
 static int CadenciaTiro = 0;
 static int TiposNave = 0;
 
-static Fundo fundo[Num_Cenario];
+static Espaco espaco[Num_Cenario];
 static Jogador jogador;
 static Tiro tiro[Num_Tiro];
 static Inimigo inimigo[Num_Inimigos];
@@ -94,23 +94,23 @@ void Iniciar(void)
     //Fundo
     for (int i = 0; i < Num_Cenario; i++)
     {
-    fundo[i].rect.height = GetScreenHeight();
-    fundo[i].rect.width = GetScreenWidth()/2;
+    espaco[i].rect.height = GetScreenHeight();
+    espaco[i].rect.width = GetScreenWidth()/2;
 
     if(i < Num_Cenario/2)
     {
-        fundo[i].FundoLocal.x = (GetScreenWidth()/2)*i;
-        fundo[i].FundoLocal.y = 0;
+        espaco[i].FundoLocal.x = (GetScreenWidth()/2)*i;
+        espaco[i].FundoLocal.y = 0;
     }
 
     else
     {
-        fundo[i].FundoLocal.x = GetScreenWidth()/2*(i-(Num_Cenario/2));
-        fundo[i].FundoLocal.y = -GetScreenHeight();
+        espaco[i].FundoLocal.x = GetScreenWidth()/2*(i-(Num_Cenario/2));
+        espaco[i].FundoLocal.y = -GetScreenHeight();
     }
     
 
-    fundo[i].Cor = WHITE;
+    espaco[i].Cor = WHITE;
     }
 
     Cenario = LoadTexture("assets/Fase3/Fundo.png");
@@ -212,10 +212,10 @@ void Atualizar(void)
     //Comportamento do fundo
         for (int i = 0; i < Num_Cenario; i++)
         {
-            fundo[i].FundoLocal.y += 8;
-            if(fundo[i].FundoLocal.y >= GetScreenHeight())
+            espaco[i].FundoLocal.y += 8;
+            if(espaco[i].FundoLocal.y >= GetScreenHeight())
             {
-                fundo[i].FundoLocal.y = -GetScreenHeight();
+                espaco[i].FundoLocal.y = -GetScreenHeight();
             }
         }
         
@@ -412,7 +412,7 @@ void Desenhando(void)
             //Desenhando fundo
             for (int i = 0; i < Num_Cenario; i++)
             {               
-                DrawTextureRec(Cenario, fundo[i].rect, fundo[i].FundoLocal, WHITE);
+                DrawTextureRec(Cenario, espaco[i].rect, espaco[i].FundoLocal, WHITE);
             }
 
             //Desenhando pontuacao
