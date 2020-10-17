@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include "fase2.c"
 #include "Boss.c"
-#include "naveFase.c"
+#include "faseNave.c"
 #include "faseRunner.c"
 #define PHYSAC_IMPLEMENTATION
 #define PHYSAC_NO_THREADS
