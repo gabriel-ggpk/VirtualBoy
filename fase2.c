@@ -51,6 +51,9 @@ void initfase2(void)
 {
 SetConfigFlags(FLAG_MSAA_4X_HINT);
 InitPhysics();
+
+//TEXTURA DO PLAYER
+
 player.txt = LoadTexture("assets/Fase2/half.png");
 player.txt.width =600;
 player.txt.height =240;
@@ -58,14 +61,15 @@ player.rect = (Rectangle) {0,0,player.txt.width/12,player.txt.height/4};
 player.position = (Vector2){0,0};
 player.body = CreatePhysicsBodyRectangle((Vector2){ 0,0 }, player.rect.width,player.rect.height, 1);
 player.body->freezeOrient = true;
+
+//TEXTURA DAS PLATAFORMAS
+
 tilesTxt  = LoadTexture("assets/Fase2/castleTiles.png");
 tilesTxt.width = 525;
 tilesTxt.height = 375;
 tilesRect = (Rectangle){0,0,2*tilesTxt.width/21,2*tilesTxt.height/15};
 tilesRect.x = 2*tilesTxt.width/21;
 tilesRect.y = 2*tilesTxt.height/15;
-
-
 
  PhysicsBody base = CreatePhysicsBodyRectangle((Vector2){ 0, 50 }, 450, 100, 10);
     base->enabled = false;
