@@ -5,7 +5,7 @@ typedef struct
 {
     Rectangle rect;
     Vector2 FundoLocal;
-    Color Cor;
+
 } Espaco;
 
 //Define struct do jogador.
@@ -17,7 +17,6 @@ typedef struct
     float Velocidade;
     Vector2 ExpLocal;
     Vector2 NaveLocal;
-    Color Cor;
     bool Explodir;
 } Jogador;
 
@@ -29,7 +28,6 @@ typedef struct
     Vector2 Velocidade;
     Vector2 TiroLocal;
     bool Ativo;
-    Color Cor;
 } Tiro;
 
 //Define struct do inimigo.
@@ -44,19 +42,30 @@ typedef struct
     Vector2 InimigoLocal;
     bool Explodir;
     bool Ativo;
-    Color cor;
 } Inimigo;
+
+//Define struct do portal
+typedef struct 
+{
+    int currentFrameX;
+    int currentFrameY;
+    Rectangle Teletransporte;
+    Vector2 PortalLocal;
+    bool Teletransportar;
+} Portal;
 
 #define Num_Tiro 50
 #define Num_Inimigos 50
 #define Num_Cenario 4
 #define Tipos_Inimigos 3
 
-static bool gameOver = false;
+static bool Cutscene = true;
+//static bool gameOver = false;
 static bool pause =  false;
 static bool parado = false;
 static bool victory = false;
 
+static int gameOver = 0;
 static int Movimento = 2;
 static int CadenciaTiro = 0;
 static int TiposNave = 0;
@@ -65,19 +74,23 @@ static Espaco espaco[Num_Cenario];
 static Jogador jogador;
 static Tiro tiro[Num_Tiro];
 static Inimigo inimigo[Num_Inimigos];
+static Portal portal;
 
-static int AtivarInimigos = 20;
+static int AtivarInimigos = 5; //20;
 static int Objetivo = 50;
 static int InimigosMortes = 0;
 
 static int framesCounter = 0;
 static int framesSpeed = 10;
+static int ContadorFrame = 0;
+static int VelocidadeFrame = 8;
 
 static Texture2D Cenario;
 static Texture2D Nave[5];
 static Texture2D Tiros;
 static Texture2D Adversario[Tipos_Inimigos];
 static Texture2D ExplosaoI;
+static Texture2D Aparecer;
 
 //Inicializa
 static void Iniciar(void);   
@@ -110,7 +123,6 @@ void Iniciar(void)
     }
     
 
-    espaco[i].Cor = WHITE;
     }
 
     Cenario = LoadTexture("assets/Fase3/Fundo.png");
@@ -131,7 +143,6 @@ void Iniciar(void)
 
     jogador.currentFrame = 0;
 
-    jogador.Cor = WHITE;
     jogador.Velocidade = 6.0;
 
     Nave[0] = LoadTexture("assets/Fase3/Nave3E.png");
@@ -151,7 +162,6 @@ void Iniciar(void)
 
         tiro[i].Velocidade.y = -10;
         tiro[i].Ativo = false;
-        tiro[i].Cor = MAROON;
     }
 
     Tiros = LoadTexture("assets/Fase3/Tiro1.png");
@@ -177,7 +187,6 @@ void Iniciar(void)
 
         inimigo[i].currentFrame = 0;
         inimigo[i].Ativo = true;
-        inimigo[i].cor = BLUE;
     }  
 
     Adversario[0] = LoadTexture("assets/Fase3/Inimigo1.png");
@@ -186,13 +195,72 @@ void Iniciar(void)
 
     ExplosaoI = LoadTexture("assets/Fase3/explosao.png"); 
 
+    //Portal
+    portal.currentFrameX = 0;
+    portal.currentFrameY = 1;
+    portal.Teletransporte.width = 512;
+    portal.Teletransporte.height = 160;
+    portal.Teletransporte.y = 160;
+    portal.PortalLocal.x = jogador.NaveLocal.x - 224;
+    portal.PortalLocal.y = jogador.NaveLocal.y - 60;
+    portal.Teletransportar = true;
+
+    Aparecer = LoadTexture("assets/Portal.png");
+    Aparecer.height = 480;
+    Aparecer.width = 4096;
+
 }
+
+
 
 void Atualizar(void)
 {
-    if(!gameOver)
+    if(Cutscene)
     {
-        if (IsKeyPressed('P')){
+        //Portal
+        ContadorFrame++;
+        
+        if(portal.Teletransportar)
+        {
+            if(ContadorFrame >= (60/VelocidadeFrame))
+            {   
+                ContadorFrame = 0;
+                portal.currentFrameX++;
+
+                if (portal.currentFrameX > 7)
+                {
+                    portal.currentFrameX = 0;
+
+                    if(portal.currentFrameY == 1)
+                    {
+                        portal.currentFrameY = 0;
+                    }
+
+                    else if(portal.currentFrameY == 0)
+                    {
+                        portal.currentFrameY = 2;
+                    }
+
+                    else if(portal.currentFrameY == 2)
+                    {
+                        portal.Teletransportar = false; 
+                        Cutscene = false;
+                        gameOver = 1;
+                    }    
+                }
+                portal.Teletransporte.x = portal.currentFrameX*512;
+                portal.Teletransporte.y = portal.currentFrameY*160;
+
+                    
+            }
+        }
+
+    }
+
+    if(gameOver == 1)
+    {
+        if (IsKeyPressed('P'))
+        {
             pause = !pause;
             parado = !parado;
         }    
@@ -201,11 +269,11 @@ void Atualizar(void)
         {
             if (InimigosMortes == Objetivo) victory = true;
         }
-    }
+    
     if (IsKeyPressed(KEY_ENTER))
         {
             Iniciar();
-            gameOver = false;
+            gameOver = 0;
         }
     if (!parado)
     {
@@ -308,8 +376,8 @@ void Atualizar(void)
                         inimigo[j].ExpLocal.y = inimigo[j].hit.y;
 
 
-                        inimigo[j].hit.x = GetRandomValue(GetScreenWidth(), GetScreenWidth() + 1000);
-                        inimigo[j].hit.y = GetRandomValue(0, GetScreenHeight() - inimigo[j].hit.height);
+                        inimigo[j].hit.x = GetRandomValue(0, GetScreenWidth() - 64);
+                        inimigo[j].hit.y = GetRandomValue(-GetScreenHeight(), - 64);
 
                         CadenciaTiro = 0;
                         InimigosMortes++;
@@ -380,7 +448,7 @@ void Atualizar(void)
                 if (jogador.currentFrame > 8)
                 {
                     jogador.currentFrame = 0;
-                    gameOver = true; 
+                    gameOver = 4; 
 
                 }
                 jogador.Explo.x = jogador.currentFrame*65;
@@ -395,6 +463,7 @@ void Atualizar(void)
         }
 
     }
+    }
 }
 
 void Desenhando(void)
@@ -407,7 +476,7 @@ void Desenhando(void)
     BeginDrawing();
         ClearBackground(WHITE);
 
-        if(!gameOver)
+        if(gameOver < 4)
         {       
             //Desenhando fundo
             for (int i = 0; i < Num_Cenario; i++)
@@ -417,6 +486,21 @@ void Desenhando(void)
 
             //Desenhando pontuacao
             DrawText(TextFormat("INIMIGOS: %i ", (Objetivo - InimigosMortes)), 15, 15, 30, MAGENTA);
+
+            //Desenhando Portal
+            if(Cutscene)
+            {
+                
+                if(portal.currentFrameY == 2) 
+                {
+                    DrawTexture(Nave[Movimento], jogador.NaveLocal.x, jogador.NaveLocal.y, WHITE);
+                }
+                DrawTextureRec(Aparecer, portal.Teletransporte, portal.PortalLocal, WHITE);
+                
+            }
+
+            if(gameOver == 1)
+            {
 
             //Desenhando tiro
             for (int i = 0; i < Num_Tiro; i++)
@@ -476,10 +560,15 @@ void Desenhando(void)
             if (pause){
                 DrawText("PAUSE", GetScreenWidth()/2 - MeasureText("PAUSE", 40)/2, GetScreenHeight()/2 - 40, 40, WHITE);
                 parado = true;
-            }    
+            } 
+
+            }
+              
         }
-        else
+        
+        else if (gameOver == 4)
         {
+
             DrawText("PRECIONE [ENTER] PARA JOGAR", GetScreenWidth()/2 - MeasureText("PRECIONE [ENTER] PARA JOGAR", 20)/2, GetScreenHeight()/2 - 50, 20, BLACK);
             InimigosMortes = 0;
         }
