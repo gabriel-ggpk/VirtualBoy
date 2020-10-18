@@ -27,6 +27,8 @@ typedef struct Enviroment
 
 Envment base;
 Envment tiles[8];
+Texture2D tilesTxt;
+Rectangle tilesRect;
 Camera2D cameraJumper = {0};
 
     
@@ -49,7 +51,6 @@ void initfase2(void)
 {
 SetConfigFlags(FLAG_MSAA_4X_HINT);
 InitPhysics();
-// SetPhysicsGravity(0.0f, 1.1f);
 player.txt = LoadTexture("assets/Fase2/half.png");
 player.txt.width =600;
 player.txt.height =240;
@@ -57,16 +58,16 @@ player.rect = (Rectangle) {0,0,player.txt.width/12,player.txt.height/4};
 player.position = (Vector2){0,0};
 player.body = CreatePhysicsBodyRectangle((Vector2){ 0,0 }, player.rect.width,player.rect.height, 1);
 player.body->freezeOrient = true;
-for(int z=0;z<8;z++){
-tiles[z].txt = LoadTexture("assets/Fase2/castleTiles.png");
-tiles[z].txt.width = 525;
-tiles[z].txt.height = 375;
-tiles[z].rect = (Rectangle){0,0,2*tiles[z].txt.width/21,2*tiles[z].txt.height/15};
-tiles[z].rect.x = 2*tiles[z].txt.width/21;
-tiles[z].rect.y = 2*tiles[z].txt.height/15;
-}
+tilesTxt  = LoadTexture("assets/Fase2/castleTiles.png");
+tilesTxt.width = 525;
+tilesTxt.height = 375;
+tilesRect = (Rectangle){0,0,2*tilesTxt.width/21,2*tilesTxt.height/15};
+tilesRect.x = 2*tilesTxt.width/21;
+tilesRect.y = 2*tilesTxt.height/15;
 
-    PhysicsBody base = CreatePhysicsBodyRectangle((Vector2){ 0, 50 }, 450, 100, 10);
+
+
+ PhysicsBody base = CreatePhysicsBodyRectangle((Vector2){ 0, 50 }, 450, 100, 10);
     base->enabled = false;
 
     cameraJumper.target = (Vector2) {0,0};
@@ -166,7 +167,7 @@ tiles[z].rect.y = 2*tiles[z].txt.height/15;
             for(int x=0;x<8;x++){
                 int rectsize = tiles[x].rect.width/50;
                for(int y = 0;y<rectsize;y++){
-                DrawTextureRec(tiles[x].txt,tiles[x].rect,(Vector2){tiles[x].rect.x+(y*50),tiles[x].rect.y},WHITE);
+                DrawTextureRec(tilesTxt,tilesRect,(Vector2){tiles[x].rect.x+(y*50),tiles[x].rect.y},WHITE);
             
                 }
             }
