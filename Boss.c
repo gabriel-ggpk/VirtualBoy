@@ -5,17 +5,21 @@ typedef struct{
     Texture2D imagem;
     Rectangle frameRec;
     Vector2 posi;
+    Rectangle colisao;
     int vel;
     int lado;
     int linha;
-    Rectangle colisao;
     int dano;
+    int vida;
 }hero;
 typedef struct{
     Texture2D imagem;
     Rectangle frameRec;
     Vector2 posi;
     Rectangle colisao;
+    Color cor;
+    Color ceu;
+    int vida;
 }chefe;
 typedef struct{
     Texture2D imagem;
@@ -53,10 +57,16 @@ chefe computador;
 laser armaLaserDir;
 laser armaLaserEsc;
 canhao armaCanhao;
-Fundo fundo;
+Imagem Coracao;
+Imagem LifeBar;
+Rectangle barRec;
+Rectangle lifeRec;
+Imagem portal4;
+Rectangle portal4Rec;
 
-int lasersAtivos = 1;
-int canhaoAtiva = 0;
+int parteCena = 0;
+int lasersAtivos = 0;
+int canhaoAtiva = -1;
 
 //partes da sala base
 Fundo Back;
@@ -65,7 +75,6 @@ Rectangle arvore2;
 Rectangle plataformaChao;
 Rectangle plataformaAr;
 Rectangle placa;
-
 Imagem assets;
 Rectangle tetoLinha;
 Rectangle tetoColuna;
@@ -80,6 +89,9 @@ Rectangle paredeComputadorDir;
 Rectangle paredeComputadorEsc;
 
 //funções
+//barras de vida
+void DrawLifeBar(int vida);
+void DrawCoracao(int vida);
 //cenario
 void drawFundo();
 void animaFundo();
@@ -93,11 +105,16 @@ void moveLaser();
 //canhao
 void animaCanhao();
 void atiraCanhao();
+void funcionaCanhao();
+//vilao
+void animaComputador();
 //personagem
 void atualizarPersonagem();
 void animaPersonagem();
+//cenas
+void cenaComeco();
 //rotina da luta
-void rotinaJogo();
+
 
 void inicializarNivelBoss();
 void atualizarNivelBoss();
@@ -110,10 +127,6 @@ int BOSS(){
     Texture2D Industri = LoadTexture("assets/Boss/Industrial.png");
     Industri.width = Industri.width*2;
     Industri.height = Industri.height*2;
-    Texture2D Computador = LoadTexture("assets/Boss/PC.png");
-    Computador.width = Computador.width*6.4;
-    Computador.height = Computador.height*6.4;
-    computador.imagem = Computador;
 
     inicializarSala(Industri);
     inicializarNivelBoss();
@@ -126,17 +139,21 @@ int BOSS(){
         }
 
         atualizarNivelBoss();
-        atualizarPersonagem();
+        if(parteCena > 2)
+            atualizarPersonagem();
 
         drawNivelBoss();
     }
 
     UnloadTexture(Industri);
     UnloadTexture(virtualGuy.imagem);
-    UnloadTexture(Computador);
+    UnloadTexture(computador.imagem);
     UnloadTexture(armaLaserDir.imagem);
     UnloadTexture(armaCanhao.imagemArma);
     UnloadTexture(armaCanhao.imagemTiro);
+    UnloadTexture(Coracao.image);
+    UnloadTexture(LifeBar.image);
+    UnloadTexture(portal4.image);
     UnloadTexture(Back.layer1);
     UnloadTexture(Back.layer2);
     UnloadTexture(Back.layer3);
@@ -151,6 +168,13 @@ int BOSS(){
 
 
 void inicializarNivelBoss(){
+    LifeBar.image = LoadTexture("assets/Boss/bar.png");
+    LifeBar.image.width = LifeBar.image.width*5;
+    LifeBar.image.height = LifeBar.image.height*5;
+    Coracao.image = LoadTexture("assets/Boss/heart.png");
+    Coracao.image.width = Coracao.image.width*5;
+    Coracao.image.height = Coracao.image.height*5;
+
     virtualGuy.imagem = LoadTexture("assets/full.png");
     virtualGuy.imagem.width = virtualGuy.imagem.width*2;
     virtualGuy.imagem.height = virtualGuy.imagem.height*2;
@@ -158,27 +182,34 @@ void inicializarNivelBoss(){
     virtualGuy.frameRec.height = virtualGuy.imagem.height/14;
     virtualGuy.frameRec.x = virtualGuy.frameRec.width*0;
     virtualGuy.frameRec.y = virtualGuy.frameRec.height*2;
-    virtualGuy.posi.x = GetScreenWidth()/2;
-    virtualGuy.posi.y = GetScreenHeight()/2;
+    virtualGuy.posi.x = GetScreenWidth()/2 -virtualGuy.frameRec.width/2;
+    virtualGuy.posi.y = GetScreenHeight()/2 +chao.height;
     virtualGuy.vel = 3;
     virtualGuy.lado = 1;
     virtualGuy.dano = 0;
     virtualGuy.linha = 2;
+    virtualGuy.vida = 3;
     virtualGuy.colisao.x = virtualGuy.posi.x;
     virtualGuy.colisao.y = virtualGuy.posi.y;
     virtualGuy.colisao.width = virtualGuy.frameRec.width-32;
     virtualGuy.colisao.height = virtualGuy.frameRec.height-40;
 
+    computador.imagem = LoadTexture("assets/Boss/PC.png");
+    computador.imagem.width = computador.imagem.width*6.4;
+    computador.imagem.height = computador.imagem.height*6.4;
     computador.frameRec.width = computador.imagem.width/5;
     computador.frameRec.height = computador.imagem.height/3;
     computador.frameRec.x = computador.frameRec.width*0;
-    computador.frameRec.y = computador.frameRec.height*2;
+    computador.frameRec.y = computador.frameRec.height*1;
     computador.posi.x = (GetScreenWidth()/2) - chao.width*1.5;
     computador.posi.y = chao.height*6;
+    computador.cor = RAYWHITE;
+    computador.ceu = (Color){102, 191, 205};
     computador.colisao.width = computador.frameRec.width - 32;
     computador.colisao.height = computador.frameRec.height/1.5;
     computador.colisao.x = computador.posi.x + 16;
     computador.colisao.y = computador.posi.y;
+    computador.vida = 6;
 
     armaLaserDir.imagem = LoadTexture("assets/Boss/laser.png");
     armaLaserDir.imagem.width = armaLaserDir.imagem.width*4;
@@ -221,6 +252,7 @@ void inicializarNivelBoss(){
     armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
     armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*4.8);
 
+
     Back.layer1 = LoadTexture("assets/Boss/Clouds_01.png");
     Back.layer1.width = GetScreenWidth();
     Back.layer1.height = Back.layer1.height*3;
@@ -237,7 +269,6 @@ void inicializarNivelBoss(){
     placa.height = Back.layer7.height;
     placa.x = placa.width*0;
     placa.y = 0;
-
     Back.layer4 = LoadTexture("assets/Boss/tree.png");
     Back.layer4.width = Back.layer4.width*3;
     Back.layer4.height = Back.layer4.height*3;
@@ -252,7 +283,6 @@ void inicializarNivelBoss(){
     arvore2.height = Back.layer8.height;
     arvore2.x = arvore2.width*0;
     arvore2.y = 0;
-
     Back.layer5 = LoadTexture("assets/Boss/PlataformaChao.png");
     Back.layer5.width = Back.layer5.width*3;
     Back.layer5.height = Back.layer5.height*3;
@@ -267,76 +297,119 @@ void inicializarNivelBoss(){
     plataformaAr.height = Back.layer6.height;
     plataformaAr.x = plataformaAr.width*0;
     plataformaAr.y = 0;
+
+    portal4.image = LoadTexture("assets/Portal.png");
+    portal4.image.width = portal4.image.width*4;
+    portal4.image.height = portal4.image.height*2;
+    portal4Rec.width = portal4.image.width/8;
+    portal4Rec.height = portal4.image.height/3;
+    portal4Rec.x = 0;
+    portal4Rec.y = portal4Rec.height*1;
 }
 void atualizarNivelBoss(){
-    animaFundo();
-
-    animaPersonagem();
+    if(parteCena != 4)
+        animaFundo();
 
     animaLaser();
     moveLaser();
-
     animaCanhao();
     atiraCanhao();
+    funcionaCanhao();
     
-    rotinaJogo();
+    animaComputador();
+    animaPersonagem();
 
-    if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 5.0, computador.colisao)){
-        computador.frameRec.x = computador.frameRec.width*4;
-    }
-    
-    static int frameCont  = 0;
-    static int frameAtual  = 0;
-    frameCont++;
-    if (frameCont >= 60/2){
-        frameCont = 0;
-        frameAtual++;
-        if(frameAtual > 1){
-            frameAtual = 0;
-        }
-        computador.frameRec.x = computador.frameRec.width*frameAtual;
-    }
+    cenaComeco();
 }
 void drawNivelBoss(){
     BeginDrawing();
         drawFundo();
-
         drawSala();
+
         DrawTextureRec(computador.imagem, computador.frameRec, computador.posi, RAYWHITE);
-        DrawTextureRec(virtualGuy.imagem, virtualGuy.frameRec, virtualGuy.posi, RAYWHITE);
+        if(parteCena > 0)
+            DrawTextureRec(virtualGuy.imagem, virtualGuy.frameRec, virtualGuy.posi, RAYWHITE);
+        
         drawLaser();
         DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*7), RAYWHITE);
         DrawTextureRec(armaCanhao.imagemTiro, armaCanhao.frameRec, armaCanhao.posi, GREEN);
+
+        DrawLifeBar(computador.vida);
+        DrawCoracao(virtualGuy.vida);
         
+        DrawTextureRec(portal4.image, portal4Rec, (Vector2){GetScreenWidth()/2 -portal4Rec.width/2, GetScreenHeight()/2}, RAYWHITE);
         //DrawRectangleLines(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, BLUE);
         //DrawCircleLines(armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2), 10.0, RED);
     EndDrawing();
 }
 
-//rotina do jogo
-void rotinaJogo(){
-    static int frameCont  = 0;
-    static int frameAtual  = 0;
+//cenas
+void cenaComeco(){
+    if(virtualGuy.vida == 0){
+        parteCena = -1;
+        computador.cor = RED;
+        computador.ceu = GRAY;
+        lasersAtivos = 0;
+        canhaoAtiva = -1;
+    }
+    if(computador.vida == 0){
+        parteCena = 4;
+        computador.cor = RAYWHITE;
+        computador.ceu = (Color){102, 191, 205};
+        lasersAtivos = 0;
+        canhaoAtiva = -1;
+    }
 
-    if(canhaoAtiva == 0){
-        frameCont++;
-        if (frameCont >= 60){
-            frameCont = 0;
-            frameAtual++;
-            if(frameAtual > 2){
-                frameAtual = 0;
-                armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
-                armaCanhao.frameRec.y = 0;
-                armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
-                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*4.8);
+    if(parteCena == 0){
+        static int frameCont1  = 0;
+        static int frameAtual1  = 0;
+        frameCont1++;
+        if (frameCont1 >= 60/8){
+            frameCont1 = 0;
+            frameAtual1++;
+            if(frameAtual1 > 7){
+                portal4Rec.y = portal4Rec.height*0;
+                portal4Rec.x = 0;
+                parteCena = 1;
             }
-            if(frameAtual == 2){
-                canhaoAtiva = 1;
+            portal4Rec.x = portal4Rec.width*frameAtual1;
+        }
+    }
+    if(parteCena == 1){
+        static int frameCont2  = 0;
+        static int frameAtual2  = 0;
+        frameCont2++;
+        if (frameCont2 >= 60/8){
+            frameCont2 = 0;
+            frameAtual2++;
+            if(frameAtual2 > 7){
+                portal4Rec.y = portal4Rec.height*2;
+                portal4Rec.x = 0;
+                parteCena = 2;
             }
-            armaCanhao.frameRec.x = armaCanhao.frameRec.width*frameAtual;
+            portal4Rec.x = portal4Rec.width*frameAtual2;
+        }
+    }
+    if(parteCena == 2){
+        static int frameCont3  = 0;
+        static int frameAtual3  = 0;
+        frameCont3++;
+        if (frameCont3 >= 60/8){
+            frameCont3 = 0;
+            frameAtual3++;
+            if(frameAtual3 > 7){
+                parteCena = 3;
+                computador.frameRec.y = computador.frameRec.height*2;
+                lasersAtivos = 1;
+                canhaoAtiva = 0;
+            }
+            if(frameAtual3 < 8)
+                portal4Rec.x = portal4Rec.width*frameAtual3;
         }
     }
 }
+
+//rotina do jogo
 
 //personagem movimentos
 void atualizarPersonagem(){
@@ -445,6 +518,7 @@ void atualizarPersonagem(){
 
     if(CheckCollisionRecs(virtualGuy.colisao, armaLaserEsc.colisao)){
         virtualGuy.dano = 60;
+        virtualGuy.vida--;
         if(virtualGuy.lado == 1){
             virtualGuy.linha = 4;
         }
@@ -454,6 +528,7 @@ void atualizarPersonagem(){
     }
     if(CheckCollisionRecs(virtualGuy.colisao, armaLaserDir.colisao)){
         virtualGuy.dano = 60;
+        virtualGuy.vida--;
         if(virtualGuy.lado == 1){
             virtualGuy.linha = 4;
         }
@@ -463,6 +538,7 @@ void atualizarPersonagem(){
     }
     if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 10.0, virtualGuy.colisao)){
         virtualGuy.dano = 60;
+        virtualGuy.vida--;
         armaCanhao.explodir = 1;
         canhaoAtiva = 0;
         if(virtualGuy.lado == 1){
@@ -516,6 +592,43 @@ void animaPersonagem(){
             frameAtual = 0;
         }
         virtualGuy.frameRec.x = virtualGuy.frameRec.width*frameAtual;
+    }
+}
+
+//chefe funcionar
+void animaComputador(){
+    static int ivuneravel = 0;
+
+    if(ivuneravel > 0){
+        computador.frameRec.x = computador.frameRec.width*4;
+        computador.cor = RAYWHITE;
+        computador.ceu = (Color){102, 191, 205};
+        ivuneravel--;
+    }
+
+    if(parteCena > 2){
+        if(ivuneravel == 0){
+            computador.ceu = GRAY;
+            computador.cor = RED;
+            if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 5.0, computador.colisao)){
+                ivuneravel = 150;
+                computador.vida--;
+            }
+        }
+    }
+
+    if(parteCena != 4){
+        static int frameCont  = 0;
+        static int frameAtual  = 0;
+        frameCont++;
+        if (frameCont >= 60/2){
+            frameCont = 0;
+            frameAtual++;
+            if(frameAtual > 1){
+                frameAtual = 0;
+            }
+            computador.frameRec.x = computador.frameRec.width*frameAtual;
+        }
     }
 }
 
@@ -689,7 +802,7 @@ void animaCanhao(){
     static int frameCont  = 0;
     static int frameAtual  = 3;
 
-    if(armaCanhao.explodir != 0){
+    if(armaCanhao.explodir == 1){
         frameCont++;
         if (frameCont >= 60/10){
             frameCont = 0;
@@ -719,7 +832,7 @@ void atiraCanhao(){
         A = dx/tempo;
         B = dy/tempo;
     }
-    else{
+    else if(canhaoAtiva == 1){
         armaCanhao.posi.x += A;
         armaCanhao.posi.y += B;
 
@@ -741,6 +854,76 @@ void atiraCanhao(){
             armaCanhao.explodir = 1;
         } 
     }
+}
+void funcionaCanhao(){
+    static int frameCont  = 0;
+    static int frameAtual  = 0;
+
+    if(canhaoAtiva == -1){
+        armaCanhao.posi.x = 5000;
+    }
+    if(canhaoAtiva == 0){
+        frameCont++;
+        if (frameCont >= 60){
+            frameCont = 0;
+            frameAtual++;
+            if(frameAtual > 2){
+                frameAtual = 0;
+                armaCanhao.frameRec.x = armaCanhao.frameRec.height*0;
+                armaCanhao.frameRec.y = 0;
+                armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
+                armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*4.8);
+            }
+            if(frameAtual == 2){
+                canhaoAtiva = 1;
+            }
+            armaCanhao.frameRec.x = armaCanhao.frameRec.width*frameAtual;
+        }
+    }
+}
+
+//life
+void DrawCoracao(int vida){
+    Rectangle coracaoRec;
+    coracaoRec.width = Coracao.image.width;
+    coracaoRec.height = Coracao.image.height/2;
+    coracaoRec.x = 0;
+    coracaoRec.y = coracaoRec.height;
+    Rectangle coracao2Rec;
+    coracao2Rec.width = Coracao.image.width;
+    coracao2Rec.height = Coracao.image.height/2;
+    coracao2Rec.x = 0;
+    coracao2Rec.y = coracao2Rec.height*0;
+
+    DrawTextureRec(Coracao.image, coracaoRec, (Vector2){635 -coracaoRec.width*1.5, 50}, RAYWHITE);
+    DrawTextureRec(Coracao.image, coracaoRec, (Vector2){640 -coracaoRec.width*0.5, 50}, RAYWHITE);
+    DrawTextureRec(Coracao.image, coracaoRec, (Vector2){645 +coracaoRec.width*0.5, 50}, RAYWHITE);
+
+    switch(vida){
+        case 3:
+            DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){645 +coracaoRec.width*0.5, 50}, RAYWHITE);
+        case 2:
+            DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){640 -coracaoRec.width*0.5, 50}, RAYWHITE);
+        case 1:
+            DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){635 -coracaoRec.width*1.5, 50}, RAYWHITE);
+            break;
+        default:
+            break;
+    }
+}
+void DrawLifeBar(int vida){
+    DrawTextureRec(LifeBar.image, (Rectangle){0, 50, LifeBar.image.width/3, 50}, (Vector2){316, 650}, RAYWHITE);
+    for(int i = 0; i < 6; i++){
+        DrawTextureRec(LifeBar.image, (Rectangle){LifeBar.image.width/3, 50, LifeBar.image.width/3, 50}, (Vector2){316 + LifeBar.image.width/3*(i+1), 650}, RAYWHITE);
+    }
+    DrawTextureRec(LifeBar.image, (Rectangle){LifeBar.image.width/3 *2, 50, LifeBar.image.width/3, 50}, (Vector2){316 + LifeBar.image.width/3 *7, 650}, RAYWHITE);
+
+    
+    for(int j = 0; j < vida; j++){
+        DrawTextureRec(LifeBar.image, (Rectangle){LifeBar.image.width/3, 0, LifeBar.image.width/3, 50}, (Vector2){316 + LifeBar.image.width/3*(j+1), 650}, RAYWHITE);
+    }
+    
+    
 }
 
 //sala base 
@@ -826,11 +1009,11 @@ void drawSala(){
 
 //Background
 void drawFundo(){
-    ClearBackground((Color){102, 191, 205});
+    ClearBackground(computador.ceu);
     DrawRectangle(0, GetScreenHeight()/2 -chao.height*2, GetScreenWidth(), GetScreenHeight(), DARKGRAY);
 
-    DrawTexture(Back.layer1, 0, 68, RAYWHITE);
-    DrawTexture(Back.layer2, 0, 35, RAYWHITE);
+    DrawTexture(Back.layer1, 0, 68, computador.cor);
+    DrawTexture(Back.layer2, 0, 35, computador.cor);
     DrawTextureRec(Back.layer3, (Rectangle){64*0, 0, 64, 64}, (Vector2){50, 300}, RAYWHITE);
     DrawTextureRec(Back.layer3, (Rectangle){64*1, 0, 64, 64}, (Vector2){120, 500}, RAYWHITE);
     DrawTextureRec(Back.layer3, (Rectangle){64*2, 0, 64, 64}, (Vector2){10, 640}, RAYWHITE);
@@ -840,14 +1023,14 @@ void drawFundo(){
     DrawTextureRec(Back.layer3, (Rectangle){64*6, 0, 64, 64}, (Vector2){1220, 350}, RAYWHITE);
     DrawTextureRec(Back.layer3, (Rectangle){64*7, 0, 64, 64}, (Vector2){1070, 550}, RAYWHITE);
 
-    DrawTextureRec(Back.layer5, plataformaChao, (Vector2){1050, 100}, RAYWHITE);
-    DrawTextureRec(Back.layer6, plataformaAr, (Vector2){50, -10}, RAYWHITE);
+    DrawTextureRec(Back.layer5, plataformaChao, (Vector2){1050, 100}, computador.cor);
+    DrawTextureRec(Back.layer6, plataformaAr, (Vector2){50, -10}, computador.cor);
 
-    DrawTextureRec(Back.layer7, placa, (Vector2){1050, 52}, RAYWHITE);
+    DrawTextureRec(Back.layer7, placa, (Vector2){1050, 52}, computador.cor);
 
-    DrawTextureRec(Back.layer4, arvore1, (Vector2){100, 170}, RAYWHITE);
-    DrawTextureRec(Back.layer8, arvore2, (Vector2){20, 400}, RAYWHITE);
-    DrawTextureRec(Back.layer4, arvore1, (Vector2){1200, 500}, RAYWHITE);
+    DrawTextureRec(Back.layer4, arvore1, (Vector2){100, 170}, computador.cor);
+    DrawTextureRec(Back.layer8, arvore2, (Vector2){20, 400}, computador.cor);
+    DrawTextureRec(Back.layer4, arvore1, (Vector2){1200, 500}, computador.cor);
 }
 void animaFundo(){
     static int frameCont1  = 0;
