@@ -309,9 +309,11 @@ void inicializarNivelBoss(){
 void atualizarNivelBoss(){
     if(parteCena != 4)
         animaFundo();
-
+    
+    if(parteCena != 4 || parteCena != -1)
+        moveLaser();
     animaLaser();
-    moveLaser();
+    
     animaCanhao();
     atiraCanhao();
     funcionaCanhao();
