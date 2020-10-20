@@ -43,8 +43,11 @@ int main(){
             break;
 
            case 2:
-            if(Fase2() == 0)
+            if(Fase2() == 2){
                 fase = 0;
+            }
+            else if(Fase2()==3) fase = 0;
+            else fase = 2;
             break;
 
            case 3:
