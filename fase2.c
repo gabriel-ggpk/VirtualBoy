@@ -189,7 +189,7 @@ base->enabled = false;
        
         if(!portalativo&&!lost&&!gotCristal){
         
-        if(frames%120==0){
+        if(frames%100==0){
        // frames = 0;
          rando = GetRandomValue(-225,255);
          randwidth = GetRandomValue(0,10);
@@ -203,10 +203,10 @@ base->enabled = false;
              randwidth = singleTile*3;
          }
 
-        tiles[i].body= CreatePhysicsBodyRectangle((Vector2){rando,cameraJumper.target.y-100},randwidth,50,10);
+        tiles[i].body= CreatePhysicsBodyRectangle((Vector2){rando,cameraJumper.target.y-90},randwidth,50,10);
         tiles[i].body->enabled = false;
         tiles[i].rect.x = rando-(randwidth/2);    
-        tiles[i].rect.y = cameraJumper.target.y-(50/2)-100;   
+        tiles[i].rect.y = cameraJumper.target.y-(50/2)-90;   
         tiles[i].rect.width = randwidth;  
         tiles[i].rect.height = 50; 
         i++;
@@ -260,7 +260,7 @@ base->enabled = false;
         if(segundos>=20){
         victoryFase2 = true;
         cristalrect.x = 0;
-        cristalrect.y = cameraJumper.target.y-400;
+        cristalrect.y = cameraJumper.target.y-350;
         }
         if(gotCristal&&IsKeyPressed(KEY_ZERO)) endgame=true;
         if(lost&&IsKeyPressed(KEY_F)) endgame=true;
@@ -287,7 +287,7 @@ base->enabled = false;
                 }
             }
             if(victoryFase2){
-                DrawTextureRec(cristaltxt,cristal,(Vector2){0,cameraJumper.target.y-400},WHITE);
+                DrawTextureRec(cristaltxt,cristal,(Vector2){0,cameraJumper.target.y-350},WHITE);
             }
             
             

@@ -13,13 +13,25 @@
 int main(){
     int windowWidth = 1280, windowHeight = 720;
     int fase = 0;
+    int framesTexto = 0;
+    const char textoInicial[27] = "teste de inscricao de tela";
+    /*const char textoFase1[];
+    const char textoFase2[]; 
+    const char textoFase3[];
+    const char textoPreBoss[];
+    const char textoVitoria[];
+    */  
+
+    /*bool gema1adquirida = 0;
+    bool gema2adquirida = 0;
+    bool gema3adquirida = 0;*/
 
     InitWindow(windowWidth, windowHeight, "Não temos um nome");
     InitAudioDevice();
 
     SetTargetFPS(60);
     while(!WindowShouldClose()){
-
+        framesTexto++;
         switch(fase){
            case 0:
             if(IsKeyPressed(KEY_ONE))
@@ -32,6 +44,7 @@ int main(){
                 fase = 4;
             BeginDrawing();
                 ClearBackground(RAYWHITE);
+                DrawText(TextSubtext(textoInicial,0,framesTexto/10),150,250,20,BLACK);
                 DrawText("Escolha uma fase 1, 2, 3 ou 4", 150, windowHeight/2, 20, BLACK);
             EndDrawing();
             break;
@@ -45,6 +58,7 @@ int main(){
            case 2:
             if(Fase2() == 2){
                 fase = 0;
+                //gema2adquirida = true;
             }
             else if(Fase2()==3) fase = 0;
             else fase = 2;
@@ -56,6 +70,7 @@ int main(){
             }
             else if(Fase3() == 2){
                 fase = 4;
+                //gema3adquirida = true;
             }
             break;
 
