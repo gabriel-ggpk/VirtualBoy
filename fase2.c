@@ -76,6 +76,7 @@ void initfase2(void)
 
 SetConfigFlags(FLAG_MSAA_4X_HINT);
 InitPhysics();
+SetPhysicsGravity(0,9.81f);
     repetido = false;
      lost = false;
      victoryFase2 = false;
@@ -274,8 +275,6 @@ base->enabled = false;
 
         if(gotCristal&&!portalativo) endgame=true;
 
-        if(lost&&IsKeyPressed(KEY_F)){ endgame=true;replayfase2= false;}
-
         if(lost&&IsKeyPressed(KEY_R)){
             lost = false;
             endgame=true;
@@ -349,6 +348,6 @@ while(!endgame){
 }
     fechar();
     if(gotCristal) return 2;
-    else if(replayfase2) return 1;
-    else return 3;
+    else return 1;
+    
 }

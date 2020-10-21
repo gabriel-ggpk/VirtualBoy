@@ -108,10 +108,10 @@ int main(){
 
            case 1:
             if(faseRunner() == 1){
-                fase = -1;
-                gemasColetadas=1;
+                fase = 0;
+                
             }
-            else if(faseRunner() == 2) fase = 2;
+            else if(faseRunner() == 2) {fase =-1; gemasColetadas=1;}
             break;
 
            case 2:
@@ -119,7 +119,6 @@ int main(){
                 fase = -1;
                 gemasColetadas=2;
             }
-            else if(Fase2()==3) fase = 0;
             else fase = 2;
             break;
 
