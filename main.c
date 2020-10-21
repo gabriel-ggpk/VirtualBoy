@@ -14,16 +14,7 @@
 int main(){
     int windowWidth = 1280, windowHeight = 720;
     int fase = 0;
-    /*const char textoFase1[];
-    const char textoFase2[]; 
-    const char textoFase3[];
-    const char textoPreBoss[];
-    const char textoVitoria[];
-    */ 
-
-    /*bool gema1adquirida = 0;
-    bool gema2adquirida = 0;
-    bool gema3adquirida = 0;*/
+    int gemasColetadas=0;
 
     InitWindow(windowWidth, windowHeight, "Não temos um nome");
     InitAudioDevice();
@@ -69,11 +60,13 @@ int main(){
             if(botaoStatus == 1){
                 frasePosi = botaoArea.y +32;
                 botaoFrame.x = botaoFrame.width; 
+                
             }
             if(botaoStatus == 2){
                 frasePosi = botaoArea.y +25;
                 botaoFrame.x = 0;
                 fase = -1;
+                botaoStatus = 0;
             }
             
             BeginDrawing();
@@ -87,22 +80,26 @@ int main(){
             break;
 
             case -1:
-             if(abertura() == 1){
-                 fase = 1;
-             }
+             if(abertura(gemasColetadas) == 0) fase = 1;
+            else if(abertura(gemasColetadas) == 1)fase = 2;
+            else if(abertura(gemasColetadas) == 2)fase = 3;
+            else if(abertura(gemasColetadas) == 3)fase = 4;
+            else if(abertura(gemasColetadas) == 4)  fase = 0;
+
              break;
 
            case 1:
             if(faseRunner() == 1){
-                fase = 0;
+                fase = -1;
+                gemasColetadas=1;
             }
             else if(faseRunner() == 2) fase = 2;
             break;
 
            case 2:
             if(Fase2() == 2){
-                fase = 0;
-                //gema2adquirida = true;
+                fase = -1;
+                gemasColetadas=2;
             }
             else if(Fase2()==3) fase = 0;
             else fase = 2;
@@ -113,14 +110,15 @@ int main(){
                 fase = 0;
             }
             else if(Fase3() == 2){
-                fase = 4;
-                //gema3adquirida = true;
+                fase = -1;
+                gemasColetadas=3;
             }
             break;
 
            case 4:
             if(BOSS() == 1){
-                fase = 0;
+                fase = -1;
+                gemasColetadas=4;
             }
             break;
         }

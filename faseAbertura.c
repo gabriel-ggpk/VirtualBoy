@@ -1,13 +1,15 @@
 #include <raylib.h>
 
-int abertura(){
+int abertura(int gemasColetadas){
     int retorno = 0;
     int AnimaPort = 0;
-    
+
     int framesTexto = 0;
-    const char textoInicial[27] = "teste de inscricao de tela";
-
-
+    const char textoInicial[] = "Finalmente! você acordou!              \nCalma, calma.\nSei que nada parece fazer sentido agora            \nem resumo eu criei você para pegar certos artefatos para mim\nEntao...                 \nMÃOS A OBRA!!!";
+    const char textofase1[] ="Texto pos fase1";
+    const char textofase2[] ="Texto pos fase2";
+    const char textofase3[] ="Texto pos fase3";
+    const char textofase4[] ="texto pos fase4";
     Texture2D PC = LoadTexture("assets/Boss/PC.png");
     PC.width = PC.width*10;
     PC.height = PC.height*10;
@@ -81,8 +83,11 @@ int abertura(){
                 DrawTextureRec(Guy, frameGuy, (Vector2){GetScreenWidth()/2 -frameGuy.width/2, 200}, RAYWHITE);
             if(AnimaPort > 0)
                 DrawTextureRec(Port, framePort, (Vector2){GetScreenWidth()/2 -framePort.width/2, 180}, RAYWHITE);
-            
-            DrawText(TextSubtext(textoInicial,0,framesTexto/10),150,250,20,WHITE);
+            if(gemasColetadas==0) DrawText(TextSubtext(textoInicial,0,framesTexto/5),150,250,20,WHITE);
+            if(gemasColetadas==1) DrawText(TextSubtext(textofase1,0,framesTexto/5),150,250,20,WHITE);
+            if(gemasColetadas==2) DrawText(TextSubtext(textofase2,0,framesTexto/5),150,250,20,WHITE);
+            if(gemasColetadas==3) DrawText(TextSubtext(textofase3,0,framesTexto/5),150,250,20,WHITE);
+            if(gemasColetadas==4) DrawText(TextSubtext(textofase4,0,framesTexto/5),150,250,20,WHITE);
             
         EndDrawing();
     }
@@ -90,6 +95,10 @@ int abertura(){
     UnloadTexture(PC);
     UnloadTexture(Guy);
     UnloadTexture(Port);
-
-    return retorno;
+    if(gemasColetadas==0)return 0;
+    if(gemasColetadas==1)return 1;
+    if(gemasColetadas==2)return 2;
+    if(gemasColetadas==3)return 3;
+    if(gemasColetadas==4)return 4;
+    
 }
