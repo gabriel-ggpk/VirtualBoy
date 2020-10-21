@@ -80,12 +80,30 @@ int main(){
             break;
 
             case -1:
-             if(abertura(gemasColetadas) == 0) fase = 1;
-            else if(abertura(gemasColetadas) == 1)fase = 2;
-            else if(abertura(gemasColetadas) == 2)fase = 3;
-            else if(abertura(gemasColetadas) == 3)fase = 4;
-            else if(abertura(gemasColetadas) == 4)  fase = 0;
+            switch (abertura(gemasColetadas))
+            {
+            case 0:
+                fase = 1;
+                break;
+            case 1:
+            fase=2;
+            break;
 
+            case 2:
+            fase=3;
+            break;
+
+            case 3:
+            fase=4;
+            break;
+
+            case 4:
+            fase=0;
+            break;
+
+            default:
+                break;
+            }
              break;
 
            case 1:
