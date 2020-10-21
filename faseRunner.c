@@ -22,7 +22,7 @@ typedef struct {
 
 const int screenWidth = 1280, screenHeight = 720;
 float frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0, exitrun = 0;
-int countdown = 3, timer = 121, frameline = 0, limit = 0, portalline = 0;
+int countdown = 3, timer = 61, frameline = 0, limit = 0, portalline = 0;
 bool spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false;
 float downx = 1, downy = 1;
 
@@ -106,7 +106,7 @@ void initRunner(){
 
 void reset (){
     frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0, exitrun = 0;
-    countdown = 3, timer = 121, frameline = 0, limit = 0, portalline = 0;
+    countdown = 3, timer = 61, frameline = 0, limit = 0, portalline = 0;
     spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false;
     downx = 1, downy = 1;
 
@@ -171,7 +171,7 @@ void contador(){
             frames_counter = 0;
         }
         else if(down){
-            if(frames_counter >= 0.035){
+            if(frames_counter >= 0.055){
                 frames_counter = 0;
                 personagem.frame++;
                 if(personagem.frame == 6){
@@ -218,7 +218,7 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 3.75 && timer >= 4 && !dead){
+    if(frame_spawn >= 4.25 && timer >= 4 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;

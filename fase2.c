@@ -67,6 +67,7 @@ Camera2D cameraJumper;
     bool portalativo;
     bool endgame;
     bool replayfase2;
+    bool endofmap;
 Player player;
 
 
@@ -82,7 +83,7 @@ InitPhysics();
      portalativo = true;
      endgame =false;
      replayfase2 = false;
-
+    endofmap = false;
      paralaxFase2=0.5;
      frames=0;
      playerTxtFrames = 0;
@@ -160,7 +161,14 @@ base->enabled = false;
     if(frames%60==0)segundos++;
 
      if (segundos>4) portalativo = false;
-        if(portalativo == true){
+     if(gotCristal&&!endofmap){
+          portalativo = true;
+        portalmode =0;
+        portalFrames = 0;
+        framecontportal = 0;
+        endofmap = 1;
+        }       
+ if(portalativo == true){
             portalFrames++;
             if(portalFrames>=60/8){
                 portalFrames=0;
@@ -257,13 +265,17 @@ base->enabled = false;
         if(player.direita) player.rect.y = 0;
         else player.rect.y = player.txt.height/4;
         }
+
         if(segundos>=20){
         victoryFase2 = true;
         cristalrect.x = 0;
         cristalrect.y = cameraJumper.target.y-350;
         }
-        if(gotCristal&&IsKeyPressed(KEY_ZERO)) endgame=true;
-        if(lost&&IsKeyPressed(KEY_F)) endgame=true;
+
+        if(gotCristal&&!portalativo) endgame=true;
+
+        if(lost&&IsKeyPressed(KEY_F)){ endgame=true;replayfase2= false;}
+
         if(lost&&IsKeyPressed(KEY_R)){
             lost = false;
             endgame=true;
@@ -295,20 +307,19 @@ base->enabled = false;
 
             if(!lost&&!gotCristal){
             DrawTextureRec(player.txt,player.rect,(Vector2){player.body->position.x-25,player.body->position.y-25},WHITE);
-            
-            if(portalativo)DrawTextureRec(portalFase2,portalrect,(Vector2){player.body->position.x-120,player.body->position.y-100},WHITE);
             }
+            if(portalativo)DrawTextureRec(portalFase2,portalrect,(Vector2){player.body->position.x-120,player.body->position.y-100},WHITE);
            
 
             
             EndMode2D();
             DrawText(TextFormat("%d", segundos),1100,600,50,RED);
-            if(victoryFase2&&gotCristal){
+            /*if(victoryFase2&&gotCristal){
                 DrawRectangleGradientH(0,0,1280,720,DARKGRAY,WHITE);
                 DrawText("YOU WON!!!",300,360,100,PURPLE);
                 DrawText("pressione 0 para voltar",100,700,20,RED);
-            }
-            else if(lost){
+            }*/
+             if(lost){
                 DrawRectangleGradientH(0,0,1280,720,DARKGRAY,BLACK);
                 DrawText("YOU LOST!!!",300,360,100,RED);
                 DrawText("pressione R para tentar de novo,ou f para desistir",100,700,20,WHITE);
