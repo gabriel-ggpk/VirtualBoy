@@ -96,6 +96,7 @@ int main(){
             if(faseRunner() == 1){
                 fase = 0;
             }
+            else if(faseRunner() == 2) fase = 2;
             break;
 
            case 2:
