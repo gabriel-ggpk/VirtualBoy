@@ -114,6 +114,12 @@ static Texture2D ExplosaoI;
 static Texture2D Aparecer;
 static Texture2D Diamante;
 
+static Sound Atirar;
+static Sound ExplodirI;
+static Sound ExplodirJ;
+static Sound Dano;
+static Sound Trilha;
+
 //Inicializa
 static void Iniciar(void);
 
@@ -131,6 +137,13 @@ static void Descarregar(void);
 
 void Iniciar(void)
 {
+
+    //Som
+    Atirar = LoadSound("sounds/FaseNave/gun.wav");
+    ExplodirI = LoadSound("sounds/FaseNave/explodeA.wav");
+    ExplodirJ = LoadSound("sounds/FaseNave/explodeJ.wav");
+    Dano = LoadSound("sounds/FaseNave/dano.wav");
+    Trilha = LoadSound("sounds/FaseNave/trilha.mp3");
 
     //Fundo
     for (int i = 0; i < Num_Cenario; i++)
@@ -327,6 +340,7 @@ void Atualizar(void)
 
         if (!pause)
         {
+            
             if (InimigosMortes >= Objetivo)
             {
                 
@@ -386,6 +400,11 @@ void Atualizar(void)
         {
             if(!Endscene)
             {
+                if(!IsSoundPlaying(Trilha))
+                {
+                    PlaySound(Trilha);
+                }
+                
                 //Comportamento do fundo
                 for (int i = 0; i < Num_Cenario; i++)
                 {
@@ -445,12 +464,14 @@ void Atualizar(void)
                         if (Vida == 1)
                         {
                             Vida--;
+                            PlaySound(ExplodirJ);
                             jogador.ExpLocal.x = jogador.hit.x;
                             jogador.ExpLocal.y = jogador.hit.y;
                             jogador.Explodir = true;
                         }
                         else
                         {
+                            PlaySound(Dano);
                             Vida--;
                             Invulneravel = true;
                         }
@@ -477,6 +498,8 @@ void Atualizar(void)
                     {
                         if (!tiro[i].Ativo && CadenciaTiro % 36 == 0)
                         {
+                            PlaySound(Atirar);
+
                             tiro[i].TiroLocal.x = jogador.NaveLocal.x + 20;
                             tiro[i].TiroLocal.y = jogador.NaveLocal.y + 16;
 
@@ -506,6 +529,7 @@ void Atualizar(void)
                             {
                                 for (int i = 0; i < AtivarInimigos; i++)
                                 {
+                                    PlaySound(ExplodirI);
                                     inimigo[i].Explodir = true;
                                     inimigo[i].ExpLocal.x = inimigo[i].hit.x;
                                     inimigo[i].ExpLocal.y = inimigo[i].hit.y;
@@ -523,6 +547,8 @@ void Atualizar(void)
                                 }
                                 else
                                 {
+                                    PlaySound(ExplodirI);
+
                                     inimigo[j].Explodir = true;
 
                                     inimigo[j].ExpLocal.x = inimigo[j].hit.x;
