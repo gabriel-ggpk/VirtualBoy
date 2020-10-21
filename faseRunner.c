@@ -23,7 +23,7 @@ typedef struct {
 const int screenWidth = 1280, screenHeight = 720;
 float frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0, exitrun = 0;
 int countdown = 3, timer = 61, frameline = 0, limit = 0, portalline = 0;
-bool spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false;
+bool spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false, despawnport = false;
 float downx = 1, downy = 1;
 
 Music music;
@@ -59,12 +59,12 @@ void initRunner(){
     background.image = LoadTexture("assets/FaseRunner/bg.png");
 
     portalrun.texture = LoadTexture("assets/portal.png");
-    portalrun.texture.width *= 1.5;
+    portalrun.texture.width *= 3;
     portalrun.width = portalrun.texture.width/8;
     portalrun.texture.height *= 1.5;
     portalrun.height = portalrun.texture.height/3;
     portalrun.frame = 0;
-    portalrun.position.x = 354;
+    portalrun.position.x = 304;
     portalrun.position.y = screenHeight -ground.image.height*1.5 - 115;
 
     coin.texture = LoadTexture("assets/FaseRunner/coin.png");
@@ -139,12 +139,13 @@ void contador(){
     if(frame_portal >= 0.1 && (portalframe || win)){
         portalrun.frame++;
         if(portalrun.frame == 6 && portalline == 2){
-            if(!portalframe) despawn = true;
+            if(!portalframe) despawnport = true;
             portalframe = false;
         }
         else if(portalrun.frame == 8){
             portalline = 2;
             portalrun.frame = 0;
+            if(!portalframe) despawn = true;
         }
 
         frame_portal = 0;
@@ -218,7 +219,7 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 4.25 && timer >= 4 && !dead){
+    if(frame_spawn >= 4.25 && timer >= 5 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;
@@ -312,7 +313,7 @@ void colisao(){
                 win = true;
                 portalrun.frame = 0;
                 portalline = 1;
-                portalrun.position.x = personagem.body->position.x - 46;
+                portalrun.position.x = personagem.body->position.x - 96;
                 portalrun.position.y = screenHeight -ground.image.height*1.5 - 115;
             }
         }
@@ -339,14 +340,14 @@ void desenho(){
             DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 92}, 0.0f, 1.6f, RAYWHITE);
         }
 
-        if(!portalframe && !despawn)
+        if(!despawn)
             DrawTextureRec(
                 personagem.texture,
                 personagem.rec,
                 (Vector2){personagem.body->position.x - 17, personagem.body->position.y - 17},
                 RAYWHITE);
-        
-        if((portalframe || win) && !despawn){
+
+        if((portalframe || win) && !despawnport){
             Rectangle portalrec = {portalrun.width * portalrun.frame, portalrun.height * portalline, portalrun.width, portalrun.height};
             portalrun.rec = portalrec;
             DrawTextureRec(
