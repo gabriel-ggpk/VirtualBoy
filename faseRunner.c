@@ -21,7 +21,7 @@ typedef struct {
 }Assets;
 
 const int screenWidth = 1280, screenHeight = 720;
-float frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0;
+float frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0, exitrun = 0;
 int countdown = 3, timer = 121, frameline = 0, limit = 0, portalline = 0;
 bool spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false;
 float downx = 1, downy = 1;
@@ -37,21 +37,21 @@ Personagem coin;
 Assets ground;
 Assets background;
 
-void initGame(){
+void initRunner(){
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitPhysics();
     SetPhysicsGravity(0.0f, 1.1f);
 
     music = LoadMusicStream("sounds/FaseRunner/desert.mp3");
-    SetMusicVolume(music, 0.2f);
+    SetMusicVolume(music, 0.02f);
     PlayMusicStream(music);
 
     jump = LoadSound("sounds/FaseRunner/jump.wav");
-    SetSoundVolume(jump, 0.01f);
+    SetSoundVolume(jump, 0.001f);
     death = LoadSound("sounds/FaseRunner/death.wav");
-    SetSoundVolume(death, 0.1f);
+    SetSoundVolume(death, 0.01f);
     birds = LoadSound("sounds/FaseRunner/birds.wav");
-    SetSoundVolume(birds, 0.01f);
+    SetSoundVolume(birds, 0.001f);
 
     ground.image = LoadTexture("assets/FaseRunner/ground.png");
     ground.body = CreatePhysicsBodyRectangle((Vector2){screenWidth / 2, GetScreenHeight() - (ground.image.height*1.5 - 18)}, 200000, 100, 10);
@@ -104,9 +104,31 @@ void initGame(){
     camera.zoom = 1.2f;
 }
 
+void reset (){
+    frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0, exitrun = 0;
+    countdown = 3, timer = 121, frameline = 0, limit = 0, portalline = 0;
+    spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false;
+    downx = 1, downy = 1;
+
+    personagem.body->enabled = true;
+    personagem.body->orient = 0;
+    personagem.body->position.x = 400;
+    personagem.body->position.y = GetScreenHeight() -ground.image.height*1.5 - 10;
+
+    for(int i = 0; i < 3; i++){
+        rock[i].position.x = -100;
+        rock[i].position.y = -100;
+        bird[i].position.x = -100;
+        bird[i].position.y = -100;
+    }
+
+    PlayMusicStream(music);
+}
+
 void contador(){
     frames_counter += GetFrameTime(), frames_countdown += GetFrameTime(), walking += GetFrameTime();
     frame_portal += GetFrameTime(), frame_coin += GetFrameTime();
+    if(win || dead) exitrun += GetFrameTime();
 
     if(frame_coin >= 0.2){
         coin.frame++;
@@ -196,7 +218,7 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 3.5 && timer >= 4 && !dead){
+    if(frame_spawn >= 3.75 && timer >= 4 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;
@@ -273,6 +295,8 @@ void colisao(){
             if(!dead) dead = CheckCollisionRecs(personagem.collision, bird[i].collision);
         }
         if(dead){
+            PlaySound(death);
+            StopMusicStream(music);
             personagem.body->enabled = false;
             personagem.frame = 0;
         }
@@ -298,8 +322,8 @@ void colisao(){
 void desenho(){
     if(dead) frameline = 4, limit = 2;
     else if(personagem.body->orient != 0) frameline = 6, limit = 6;
-    else if(IsKeyPressed(KEY_UP) || !personagem.body->isGrounded) frameline = 10, limit = 11;
-    else if(countdown < 1 && timer > -1) frameline = 0, limit = 0;
+    else if((timer > 1 && IsKeyPressed(KEY_UP)) || !personagem.body->isGrounded) frameline = 10, limit = 11;
+    else if(countdown < 1 && timer > -5 && !coindown) frameline = 0, limit = 0;
     else frameline = 2, limit = 1;
 
     Rectangle personagemrec = {personagem.width * personagem.frame, personagem.height * frameline, personagem.width, personagem.height};
@@ -315,6 +339,13 @@ void desenho(){
             DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 92}, 0.0f, 1.6f, RAYWHITE);
         }
 
+        if(!portalframe && !despawn)
+            DrawTextureRec(
+                personagem.texture,
+                personagem.rec,
+                (Vector2){personagem.body->position.x - 17, personagem.body->position.y - 17},
+                RAYWHITE);
+        
         if((portalframe || win) && !despawn){
             Rectangle portalrec = {portalrun.width * portalrun.frame, portalrun.height * portalline, portalrun.width, portalrun.height};
             portalrun.rec = portalrec;
@@ -324,12 +355,6 @@ void desenho(){
                 (Vector2){portalrun.position.x, portalrun.position.y},
                 RAYWHITE);
         }
-        if(!portalframe && !despawn)
-            DrawTextureRec(
-                personagem.texture,
-                personagem.rec,
-                (Vector2){personagem.body->position.x - 17, personagem.body->position.y - 17},
-                RAYWHITE);
 
         Rectangle coinrec = {coin.width * coin.frame, coin.height, coin.width, coin.height};
         coin.rec = coinrec;
@@ -363,10 +388,8 @@ void desenho(){
             else DrawText("Time: 0", 10, 10, 20, RAYWHITE);
         }
 
-        if(dead){
-            DrawText("YOU LOSE", screenWidth/2 - 250, screenHeight/2 - 50, 100, RAYWHITE);
-            DrawText("Pressione enter para voltar ao menu", screenWidth/2 - 170, screenHeight - 100, 20, RAYWHITE);
-        }    
+        if(dead) DrawText("YOU LOSE", screenWidth/2 - 250, screenHeight/2 - 50, 100, RAYWHITE);
+
         else if(timer < 0) DrawText("YOU WIN", screenWidth/2 - 225, screenHeight/2 - 50, 100, RAYWHITE);
 
     EndDrawing();
@@ -382,24 +405,7 @@ void gameRunner(){
     desenho();
 }
 
-int faseRunner(void){
-    int retornoRunner = 0;
-
-    initGame();
-
-    while(retornoRunner == 0){
-        if(IsKeyPressed(KEY_ZERO)){
-            retornoRunner = 1;
-        }
-        if(IsKeyPressed(KEY_SPACE)){
-        }
-        if(win){
-            retornoRunner = 2;
-        }
-        
-        gameRunner();
-    }
-
+void endRunner (){
     UnloadMusicStream(music);
     UnloadSound(jump);
     UnloadSound(death);
@@ -412,8 +418,31 @@ int faseRunner(void){
     UnloadTexture(ground.image);
     UnloadTexture(background.image);
 
-    CloseWindow();
     ClosePhysics();
+}
+
+int faseRunner(void){
+    int retornoRunner = 0;
+
+    initRunner();
+
+    do{
+        while(retornoRunner == 0){
+            if(IsKeyPressed(KEY_ZERO)) retornoRunner = 1;
+
+            else if(win && exitrun >= 2) retornoRunner = 2;
+            
+            else if(dead && exitrun >= 2) retornoRunner = -1;
+            
+            gameRunner();
+        }
+        if(retornoRunner == -1){
+            reset();
+            retornoRunner = 0;
+        }
+    }while(retornoRunner == 0);
+
+    endRunner();
 
     return retornoRunner;
 }
