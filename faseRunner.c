@@ -83,7 +83,7 @@ void initRunner(){
     personagem.height = personagem.texture.height/14;
     personagem.frame = 0;
 
-    for(int i = 0; i < 3; i++){        
+    for(int i = 0; i < 3; i++){
         rock[i].texture = LoadTexture("assets/FaseRunner/rock.png");
         rock[i].width = rock[i].texture.width * 2.5;
         rock[i].height = rock[i].texture.height * 2.5;
@@ -91,7 +91,7 @@ void initRunner(){
         rock[i].position.y = -100;
 
         bird[i].texture = LoadTexture("assets/FaseRunner/bird.png");
-        bird[i].width = bird[i].texture.width/8; 
+        bird[i].width = bird[i].texture.width/8;
         bird[i].height = bird[i].texture.height/3;
         bird[i].frame = 0 + i * 3;
         bird[i].position.x = -100;
@@ -196,12 +196,12 @@ void contador(){
 }
 
 void movimentacao(){
-    if(IsKeyPressed(KEY_UP) && personagem.body->isGrounded && !dead && personagem.body->orient == 0 && timer > 1 && !portalframe){
+    if(IsKeyPressed(KEY_UP) && personagem.body->isGrounded && !dead && personagem.body->orient == 0 && timer > 0 && !portalframe){
         PlaySound(jump);
         personagem.body->velocity.y = -0.5f;
         personagem.frame = 0;
     }
-    if(IsKeyPressed(KEY_DOWN) && !dead && timer > 1 && !portalframe){
+    if(IsKeyPressed(KEY_DOWN) && !dead && timer > 0 && !portalframe){
         if(!personagem.body->isGrounded) personagem.body->velocity.y = 0.8f;
         else{
             personagem.body->orient = 1.57;
@@ -279,13 +279,13 @@ void spawn(){
 }
 
 void colisao(){
-    Rectangle personagemC = {personagem.body->position.x - 9 * downx, personagem.body->position.y - 14 * downy, 20 * downx, 28 * downy};    
+    Rectangle personagemC = {personagem.body->position.x - 9 * downx, personagem.body->position.y - 14 * downy, 20 * downx, 28 * downy};
     personagem.collision = personagemC;
 
     for(int i = 0; i < 3; i++){
         Rectangle rockC = {rock[i].position.x, rock[i].position.y, rock[i].width - 8, rock[i].height - 10};
         rock[i].collision = rockC;
-    
+
         Rectangle birdC = {bird[i].position.x, bird[i].position.y, bird[i].width, bird[i].height + 1};
         bird[i].collision = birdC;
     }
@@ -368,14 +368,14 @@ void desenho(){
         for(int i = 0; i < 3; i++){
             DrawTextureEx(rock[i].texture, (Vector2){rock[i].position.x, rock[i].position.y}, 0.0f, 2.5f, RAYWHITE);
             Rectangle birdrec = {bird[i].width * bird[i].frame, bird[i].height, bird[i].width, bird[i].height};
-            bird[i].rec = birdrec;            
+            bird[i].rec = birdrec;
             DrawTextureRec(
                 bird[i].texture,
                 bird[i].rec,
                 (Vector2){bird[i].position.x, bird[i].position.y},
-                RAYWHITE);   
+                RAYWHITE);
         }
-        
+
         EndMode2D();
 
     if(countdown >= 0){
@@ -432,9 +432,9 @@ int faseRunner(void){
             if(IsKeyPressed(KEY_ZERO)) retornoRunner = 1;
 
             else if(win && exitrun >= 2) retornoRunner = 2;
-            
+
             else if(dead && exitrun >= 2) retornoRunner = -1;
-            
+
             gameRunner();
         }
         if(retornoRunner == -1){
