@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include <math.h>
 
 //Define struct do fundo
 typedef struct
