@@ -466,6 +466,7 @@ void Atualizar(void)
                         {
                             Vida--;
                             PlaySound(ExplodirJ);
+                            //StopSound(Trilha);
                             jogador.ExpLocal.x = jogador.hit.x;
                             jogador.ExpLocal.y = jogador.hit.y;
                             jogador.Explodir = true;
@@ -826,9 +827,10 @@ void Desenhando(void)
 
     else if (gameOver == 3)
     {
-
+        StopSound(Trilha);
         DrawText("PRECIONE [ENTER] PARA JOGAR", GetScreenWidth() / 2 - MeasureText("PRECIONE [ENTER] PARA JOGAR", 20) / 2, GetScreenHeight() / 2 - 50, 20, BLACK);
         InimigosMortes = 0;
+        Vida = 3;
     }
 
     EndDrawing();
