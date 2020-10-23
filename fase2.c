@@ -45,6 +45,9 @@ Rectangle cristalrect;
 Texture2D cristaltxt;
     
 Camera2D cameraJumper;
+
+Music musicfase2;
+Sound jumpfase2;
     float paralaxFase2;
     int frames;
     int playerTxtFrames;
@@ -82,6 +85,7 @@ void initfase2(void)
 SetConfigFlags(FLAG_MSAA_4X_HINT);
 InitPhysics();
 SetPhysicsGravity(0,9.81f);
+
     repetido = false;
      lost = false;
      victoryFase2 = false;
@@ -101,6 +105,12 @@ SetPhysicsGravity(0,9.81f);
      portalmode=0;
 
     framecontCristal = 0;
+
+    musicfase2 = LoadMusicStream("sounds/Fase2/fase2M.mp3");
+    SetMusicVolume(musicfase2,0.005f);
+    PlayMusicStream(musicfase2);
+    jumpfase2 = LoadSound("sounds/Fase2/jump.wav");
+
     
      i = 0;
      rando = 0;
@@ -153,10 +163,11 @@ base->enabled = false;
     cameraJumper.zoom = 0.7f;
     cameraJumper.offset = (Vector2) {larguraDaTela/2,AlturaDaTela/2};
     
-    
+   
 }
     
  void Refresh(){
+     
     //ATUALIZANDO FRAMES PARA SPRITES
     frames++;
     if(victoryFase2){
@@ -217,7 +228,7 @@ base->enabled = false;
         }
         //SPAWN DE PLATADORMAS
        
-        if(!portalativo&&!lost&&!gotCristal){
+        if(!portalativo&&!lost&&!gotCristal&&!victoryFase2){
         
         if(frames%100==0){
        // frames = 0;
@@ -291,19 +302,21 @@ base->enabled = false;
             endofmap = true;
         }
         
-        // MOVIMENTACAO
-
-        if (IsKeyDown(KEY_RIGHT)){ player.body->velocity.x = VELOCITY*1.1;player.direita = true;}
-        else if (IsKeyDown(KEY_LEFT)){ player.body->velocity.x = -VELOCITY*1.1;player.direita = false;}
-        else player.body->velocity.x = 0;
-        if (IsKeyDown(KEY_UP) && player.body->isGrounded) player.body->velocity.y = -VELOCITY*5;
+        
 
         //ATUALIZACAO DA CAMERA
         cameraJumper.target.y -= 1.2f;
         if(cameraJumper.target.y<(-200)) paralaxFase2 -=0.8;
         }
         if(player.body->position.y>=cameraJumper.target.y+AlturaDaTela*1.5) lost = true;
-        if(IsKeyPressed(KEY_ZERO)) lost = true;
+
+        // MOVIMENTACAO
+
+        if (IsKeyDown(KEY_RIGHT)){ player.body->velocity.x = VELOCITY*1.1;player.direita = true;}
+        else if (IsKeyDown(KEY_LEFT)){ player.body->velocity.x = -VELOCITY*1.1;player.direita = false;}
+        else player.body->velocity.x = 0;
+        if (IsKeyDown(KEY_UP) && player.body->isGrounded) player.body->velocity.y = -VELOCITY*5;
+        
         
         //ATUALIZACAO DAS SPRITES
 
@@ -316,7 +329,7 @@ base->enabled = false;
         else player.rect.y = player.txt.height/4;
         }
 
-        if(segundos>=20){
+        if(segundos>=50){
         victoryFase2 = true;
         cristalrect.x = 0;
         cristalrect.y = cameraJumper.target.y-350;
@@ -386,13 +399,14 @@ for(int z=0;z<8;z++){
             
 }
 ClosePhysics();       
-     
+    UnloadMusicStream(musicfase2);
 }
    
 int Fase2(){
     initfase2();
 while(!endgame){
     RunPhysicsStep();
+    UpdateMusicStream(musicfase2);
     Refresh();
     Desenhar();
 }
