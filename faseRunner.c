@@ -23,7 +23,7 @@ typedef struct {
 const int screenWidth = 1280, screenHeight = 720;
 float frames_counter = 0, frames_countdown = 0, walking = 0, frame_spawn = 0, frame_portal = 0, frame_coin = 0, exitrun = 0;
 int countdown = 3, timer = 61, frameline = 0, limit = 0, portalline = 0;
-bool spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false;
+bool spawn_set = false, dead = false, down = false, portalframe = true, coindown = false, win = false, despawn = false, despawnport = false;
 float downx = 1, downy = 1;
 
 Music music;
@@ -59,12 +59,12 @@ void initRunner(){
     background.image = LoadTexture("assets/FaseRunner/bg.png");
 
     portalrun.texture = LoadTexture("assets/portal.png");
-    portalrun.texture.width *= 1.5;
+    portalrun.texture.width *= 3;
     portalrun.width = portalrun.texture.width/8;
     portalrun.texture.height *= 1.5;
     portalrun.height = portalrun.texture.height/3;
     portalrun.frame = 0;
-    portalrun.position.x = 354;
+    portalrun.position.x = 304;
     portalrun.position.y = screenHeight -ground.image.height*1.5 - 115;
 
     coin.texture = LoadTexture("assets/FaseRunner/coin.png");
@@ -83,7 +83,7 @@ void initRunner(){
     personagem.height = personagem.texture.height/14;
     personagem.frame = 0;
 
-    for(int i = 0; i < 3; i++){        
+    for(int i = 0; i < 3; i++){
         rock[i].texture = LoadTexture("assets/FaseRunner/rock.png");
         rock[i].width = rock[i].texture.width * 2.5;
         rock[i].height = rock[i].texture.height * 2.5;
@@ -91,7 +91,7 @@ void initRunner(){
         rock[i].position.y = -100;
 
         bird[i].texture = LoadTexture("assets/FaseRunner/bird.png");
-        bird[i].width = bird[i].texture.width/8; 
+        bird[i].width = bird[i].texture.width/8;
         bird[i].height = bird[i].texture.height/3;
         bird[i].frame = 0 + i * 3;
         bird[i].position.x = -100;
@@ -139,12 +139,13 @@ void contador(){
     if(frame_portal >= 0.1 && (portalframe || win)){
         portalrun.frame++;
         if(portalrun.frame == 6 && portalline == 2){
-            if(!portalframe) despawn = true;
+            if(!portalframe) despawnport = true;
             portalframe = false;
         }
         else if(portalrun.frame == 8){
             portalline = 2;
             portalrun.frame = 0;
+            if(!portalframe) despawn = true;
         }
 
         frame_portal = 0;
@@ -195,12 +196,12 @@ void contador(){
 }
 
 void movimentacao(){
-    if(IsKeyPressed(KEY_UP) && personagem.body->isGrounded && !dead && personagem.body->orient == 0 && timer > 1 && !portalframe){
+    if(IsKeyPressed(KEY_UP) && personagem.body->isGrounded && !dead && personagem.body->orient == 0 && timer > 0 && !portalframe){
         PlaySound(jump);
         personagem.body->velocity.y = -0.5f;
         personagem.frame = 0;
     }
-    if(IsKeyPressed(KEY_DOWN) && !dead && timer > 1 && !portalframe){
+    if(IsKeyPressed(KEY_DOWN) && !dead && timer > 0 && !portalframe){
         if(!personagem.body->isGrounded) personagem.body->velocity.y = 0.8f;
         else{
             personagem.body->orient = 1.57;
@@ -218,7 +219,7 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 4.25 && timer >= 4 && !dead){
+    if(frame_spawn >= 4.25 && timer >= 5 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;
@@ -278,13 +279,13 @@ void spawn(){
 }
 
 void colisao(){
-    Rectangle personagemC = {personagem.body->position.x - 9 * downx, personagem.body->position.y - 14 * downy, 20 * downx, 28 * downy};    
+    Rectangle personagemC = {personagem.body->position.x - 9 * downx, personagem.body->position.y - 14 * downy, 20 * downx, 28 * downy};
     personagem.collision = personagemC;
 
     for(int i = 0; i < 3; i++){
         Rectangle rockC = {rock[i].position.x, rock[i].position.y, rock[i].width - 8, rock[i].height - 10};
         rock[i].collision = rockC;
-    
+
         Rectangle birdC = {bird[i].position.x, bird[i].position.y, bird[i].width, bird[i].height + 1};
         bird[i].collision = birdC;
     }
@@ -312,7 +313,7 @@ void colisao(){
                 win = true;
                 portalrun.frame = 0;
                 portalline = 1;
-                portalrun.position.x = personagem.body->position.x - 46;
+                portalrun.position.x = personagem.body->position.x - 96;
                 portalrun.position.y = screenHeight -ground.image.height*1.5 - 115;
             }
         }
@@ -339,14 +340,14 @@ void desenho(){
             DrawTextureEx(background.image, (Vector2){background.image.width * 1.6 * i, 92}, 0.0f, 1.6f, RAYWHITE);
         }
 
-        if(!portalframe && !despawn)
+        if(!despawn)
             DrawTextureRec(
                 personagem.texture,
                 personagem.rec,
                 (Vector2){personagem.body->position.x - 17, personagem.body->position.y - 17},
                 RAYWHITE);
-        
-        if((portalframe || win) && !despawn){
+
+        if((portalframe || win) && !despawnport){
             Rectangle portalrec = {portalrun.width * portalrun.frame, portalrun.height * portalline, portalrun.width, portalrun.height};
             portalrun.rec = portalrec;
             DrawTextureRec(
@@ -367,14 +368,14 @@ void desenho(){
         for(int i = 0; i < 3; i++){
             DrawTextureEx(rock[i].texture, (Vector2){rock[i].position.x, rock[i].position.y}, 0.0f, 2.5f, RAYWHITE);
             Rectangle birdrec = {bird[i].width * bird[i].frame, bird[i].height, bird[i].width, bird[i].height};
-            bird[i].rec = birdrec;            
+            bird[i].rec = birdrec;
             DrawTextureRec(
                 bird[i].texture,
                 bird[i].rec,
                 (Vector2){bird[i].position.x, bird[i].position.y},
-                RAYWHITE);   
+                RAYWHITE);
         }
-        
+
         EndMode2D();
 
     if(countdown >= 0){
@@ -431,9 +432,9 @@ int faseRunner(void){
             if(IsKeyPressed(KEY_ZERO)) retornoRunner = 1;
 
             else if(win && exitrun >= 2) retornoRunner = 2;
-            
+
             else if(dead && exitrun >= 2) retornoRunner = -1;
-            
+
             gameRunner();
         }
         if(retornoRunner == -1){
