@@ -162,13 +162,24 @@ base->enabled = false;
     if(frames%60==0)segundos++;
 
      if (segundos>4) portalativo = false;
-     if(gotCristal&&!endofmap){
-          portalativo = true;
-        portalmode =0;
-        portalFrames = 0;
-        framecontportal = 0;
-        endofmap = 1;
-        }       
+     if(gotCristal){
+            portalFrames++;
+            if(portalFrames>=60/8){
+                portalFrames=0;
+                framecontportal++;
+                    if(framecontportal>=8){
+                portalmode++;
+                framecontportal=0;
+            }
+            portalrect.x = framecontportal*portalFase2.width/8;
+            if(portalmode>=2){
+                portalrect.y =  2*portalFase2.height/3;
+            }   
+            if(portalmode==3)endgame = true;
+        }
+     }
+         
+
  if(portalativo == true){
             portalFrames++;
             if(portalFrames>=60/8){
@@ -182,9 +193,14 @@ base->enabled = false;
             if(portalmode>=2){
                 portalrect.y =  2*portalFase2.height/3;
             }   
-            if(portalmode==3)portalativo = false;
+            if(portalmode==3){
+                portalativo = false;
+            portalrect.y =  0;
+            portalmode = 0;
+            portalFrames=0;
+            }
         }
-     }
+ }
         playerTxtFrames++;
         if(playerTxtFrames>=60/framespeedPlayer ){
             playerTxtFrames = 0;
@@ -273,7 +289,7 @@ base->enabled = false;
         cristalrect.y = cameraJumper.target.y-350;
         }
 
-        if(gotCristal&&!portalativo) endgame=true;
+        //if(gotCristal&&!portalativo) endgame=true;
 
         if(lost&&IsKeyPressed(KEY_R)){
             lost = false;
