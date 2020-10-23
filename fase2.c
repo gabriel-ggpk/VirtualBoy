@@ -13,6 +13,7 @@ typedef struct
     Vector2 position;
     PhysicsBody body;
     bool direita;
+    
 
 }Player;
 
@@ -22,6 +23,8 @@ typedef struct Enviroment
     Texture2D txt;
     Rectangle rect;
     PhysicsBody body;
+    bool isMoving;
+    int movementspeed;
 
 }Envment;
 
@@ -68,6 +71,8 @@ Camera2D cameraJumper;
     bool endgame;
     bool replayfase2;
     bool endofmap;
+    bool movingPiece;
+    Vector2 cristal2position;
 Player player;
 
 
@@ -220,16 +225,25 @@ base->enabled = false;
          randwidth = GetRandomValue(0,10);
          if(randwidth<3){
              randwidth = singleTile;
+             movingPiece = false;
          }
          else if(randwidth<8){
              randwidth = singleTile*2;
+             movingPiece = false;
+         }
+         else if(randwidth<9){
+             randwidth = singleTile*3;
+             movingPiece = false;
          }
          else{
              randwidth = singleTile*3;
+             movingPiece = true;
          }
 
         tiles[i].body= CreatePhysicsBodyRectangle((Vector2){rando,cameraJumper.target.y-90},randwidth,50,10);
         tiles[i].body->enabled = false;
+        tiles[i].isMoving = movingPiece;
+        tiles[i].movementspeed = 5;
         tiles[i].rect.x = rando-(randwidth/2);    
         tiles[i].rect.y = cameraJumper.target.y-(50/2)-90;   
         tiles[i].rect.width = randwidth;  
@@ -254,9 +268,28 @@ base->enabled = false;
         player.body = CreatePhysicsBodyRectangle(bpos,player.rect.width,player.rect.height,1);
         player.body->freezeOrient = true; 
         player.body->velocity = veloc;
+        
 
+       
         }
+         for(int z=0;z<8;z++){
     
+            if(tiles[z].isMoving){
+                
+                tiles[z].body->position.x += tiles[z].movementspeed;
+                tiles[z].rect.x += tiles[z].movementspeed;
+                if(tiles[z].body->position.x>= 255)tiles[z].movementspeed = -tiles[z].movementspeed;
+                if(tiles[z].body->position.x<= -255)tiles[z].movementspeed = -tiles[z].movementspeed;
+                if(player.body->isGrounded&&CheckCollisionRecs((Rectangle){player.body->position.x-player.rect.width/2,player.body->position.y-player.rect.height/2,player.rect.width,player.rect.height},tiles[z].rect)){
+
+                    player.body->position.x +=tiles[z].movementspeed;
+                }
+            }
+        }
+        if(gotCristal&&!endofmap){
+            cristal2position =(Vector2){player.body->position.x-120,player.body->position.y-100};
+            endofmap = true;
+        }
         
         // MOVIMENTACAO
 
@@ -313,7 +346,7 @@ base->enabled = false;
             
                 }
             }
-            if(victoryFase2){
+            if(victoryFase2&&!gotCristal){
                 DrawTextureRec(cristaltxt,cristal,(Vector2){0,cameraJumper.target.y-350},WHITE);
             }
             
@@ -324,7 +357,8 @@ base->enabled = false;
             DrawTextureRec(player.txt,player.rect,(Vector2){player.body->position.x-25,player.body->position.y-25},WHITE);
             }
             if(portalativo)DrawTextureRec(portalFase2,portalrect,(Vector2){player.body->position.x-120,player.body->position.y-100},WHITE);
-           
+            if(gotCristal)DrawTextureRec(portalFase2,portalrect,(Vector2){-100,cameraJumper.target.y-450},WHITE);
+    
 
             
             EndMode2D();
