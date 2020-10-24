@@ -107,10 +107,10 @@ SetPhysicsGravity(0,9.81f);
     framecontCristal = 0;
 
     musicfase2 = LoadMusicStream("sounds/Fase2/fase2M.mp3");
-    SetMusicVolume(musicfase2,0.005f);
+    SetMusicVolume(musicfase2,0.007f);
     PlayMusicStream(musicfase2);
     jumpfase2 = LoadSound("sounds/Fase2/jump.wav");
-
+    SetSoundVolume(jumpfase2,0.07f);
     
      i = 0;
      rando = 0;
@@ -311,11 +311,16 @@ base->enabled = false;
         if(player.body->position.y>=cameraJumper.target.y+AlturaDaTela*1.5) lost = true;
 
         // MOVIMENTACAO
-
+if(!portalativo){
         if (IsKeyDown(KEY_RIGHT)){ player.body->velocity.x = VELOCITY*1.1;player.direita = true;}
         else if (IsKeyDown(KEY_LEFT)){ player.body->velocity.x = -VELOCITY*1.1;player.direita = false;}
         else player.body->velocity.x = 0;
-        if (IsKeyDown(KEY_UP) && player.body->isGrounded) player.body->velocity.y = -VELOCITY*5;
+        if (IsKeyDown(KEY_UP) && player.body->isGrounded){
+            PlaySound(jumpfase2);
+             player.body->velocity.y = -VELOCITY*5;
+             
+        }
+}
         
         
         //ATUALIZACAO DAS SPRITES
@@ -400,6 +405,7 @@ for(int z=0;z<8;z++){
 }
 ClosePhysics();       
     UnloadMusicStream(musicfase2);
+    UnloadSound(jumpfase2);
 }
    
 int Fase2(){
