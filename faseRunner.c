@@ -58,7 +58,7 @@ void initRunner(){
     ground.body->enabled = false;
     background.image = LoadTexture("assets/FaseRunner/bg.png");
 
-    portalrun.texture = LoadTexture("assets/portal.png");
+    portalrun.texture = LoadTexture("assets/Portal.png");
     portalrun.texture.width *= 3;
     portalrun.width = portalrun.texture.width/8;
     portalrun.texture.height *= 1.5;
