@@ -6,10 +6,10 @@ int abertura(int gemasColetadas){
 
     int framesTexto = 0;
     const char textoInicial[] = "Finalmente! você acordou!              \nCalma, calma.\nSei que nada parece fazer sentido agora            \nem resumo eu criei você para pegar certos artefatos para mim\nEntao...                 \nMÃOS A OBRA!!!";
-    const char textofase1[] ="Texto pos fase1";
-    const char textofase2[] ="Texto pos fase2";
-    const char textofase3[] ="Texto pos fase3";
-    const char textofase4[] ="texto pos fase4";
+    const char textofase1[] ="Bem facil né?\nnão pare agora, precisamos de mais dois artefatos.                                                   \n.  .  .                      \n TA OLHANDO OQUE?            \n V A I   L O G O ! ! !";
+    const char textofase2[] ="Uau, aquelas coisas surgindo do nada foram bem divertidas não acha? \nNão???            \nVocê é muito chato. \nVamos lá só falta uma, você consegue...                   \nEu acho.";
+    const char textofase3[] ="Finalmente!!! ainda bem que você não destruiu a nave\nentão é isso... \ncomo você não tem mais proposito acho melhor eu acabar com seu sofrimento...                      A G O R A   M O R R A ! ! !";
+    const char textofase4[] ="VOCÊ GANHOU!!!";
     Texture2D PC = LoadTexture("assets/Boss/PC.png");
     PC.width = PC.width*10;
     PC.height = PC.height*10;
@@ -45,13 +45,20 @@ int abertura(int gemasColetadas){
         if (framePc >= 60/2){
             framePc = 0;
             if(framePC.x == 0){
-                framePC.x = framePC.width;
+                if(gemasColetadas == 4){
+                    framePC.x = 3*framePC.width;
+                    framePC.y = 0;
+                }
+              else framePC.x = framePC.width;
             }
             else{
-                framePC.x = 0;
+                if(gemasColetadas == 4){
+                    framePC.x = 4*framePC.width;
+                    framePC.y = 2*framePC.height;
+                }
+                else framePC.x = 0;
             }
         }
-
         if(AnimaPort == 1){
             portCont++;
             if (portCont >= 60/8){
@@ -78,7 +85,7 @@ int abertura(int gemasColetadas){
         BeginDrawing();
             ClearBackground(BLACK);
             DrawTextureRec(PC, framePC, (Vector2){GetScreenWidth()/2 -framePC.width/2, 20}, RAYWHITE);
-            DrawText("Aperte enter", 580, 0, 20, WHITE);
+           if(gemasColetadas!=4) DrawText("Aperte enter", 580, 0, 20, WHITE);
             if(framePort.y == framePort.height*1)
                 DrawTextureRec(Guy, frameGuy, (Vector2){GetScreenWidth()/2 -frameGuy.width/2, 200}, RAYWHITE);
             if(AnimaPort > 0)
@@ -87,7 +94,11 @@ int abertura(int gemasColetadas){
             if(gemasColetadas==1) DrawText(TextSubtext(textofase1,0,framesTexto/5),150,250,20,WHITE);
             if(gemasColetadas==2) DrawText(TextSubtext(textofase2,0,framesTexto/5),150,250,20,WHITE);
             if(gemasColetadas==3) DrawText(TextSubtext(textofase3,0,framesTexto/5),150,250,20,WHITE);
-            if(gemasColetadas==4) DrawText(TextSubtext(textofase4,0,framesTexto/5),150,250,20,WHITE);
+
+            if(gemasColetadas==4){
+
+                DrawText(TextSubtext(textofase4,0,framesTexto/20),475,250,40,WHITE);
+            };
             
         EndDrawing();
     }
