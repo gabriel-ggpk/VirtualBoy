@@ -198,11 +198,11 @@ void inicializarNivelBoss(){
     virtualGuy.frameRec.y = virtualGuy.frameRec.height*2;
     virtualGuy.posi.x = GetScreenWidth()/2 -virtualGuy.frameRec.width/2;
     virtualGuy.posi.y = GetScreenHeight()/2 +chao.height;
-    virtualGuy.vel = 3;
+    virtualGuy.vel = 4;
     virtualGuy.lado = 1;
     virtualGuy.dano = 0;
     virtualGuy.linha = 2;
-    virtualGuy.vida = 3;
+    virtualGuy.vida = 5;
     virtualGuy.colisao.x = virtualGuy.posi.x;
     virtualGuy.colisao.y = virtualGuy.posi.y;
     virtualGuy.colisao.width = virtualGuy.frameRec.width-32;
@@ -452,7 +452,7 @@ void cenaComeco(){
     }
     if(parteCena == -1){
         if(IsKeyPressed(KEY_R)){
-            virtualGuy.vida = 3;
+            virtualGuy.vida = 5;
             virtualGuy.lado = 1;
             virtualGuy.dano = 0;
             virtualGuy.linha = 2;
@@ -962,17 +962,23 @@ void DrawCoracao(int vida){
     coracao2Rec.x = 0;
     coracao2Rec.y = coracao2Rec.height*0;
 
+    DrawTextureRec(Coracao.image, coracaoRec, (Vector2){630 -coracaoRec.width*2.5, 50}, RAYWHITE);
     DrawTextureRec(Coracao.image, coracaoRec, (Vector2){635 -coracaoRec.width*1.5, 50}, RAYWHITE);
     DrawTextureRec(Coracao.image, coracaoRec, (Vector2){640 -coracaoRec.width*0.5, 50}, RAYWHITE);
     DrawTextureRec(Coracao.image, coracaoRec, (Vector2){645 +coracaoRec.width*0.5, 50}, RAYWHITE);
+    DrawTextureRec(Coracao.image, coracaoRec, (Vector2){650 +coracaoRec.width*1.5, 50}, RAYWHITE);
 
     switch(vida){
-        case 3:
+        case 5:
+            DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){650 +coracaoRec.width*1.5, 50}, RAYWHITE);
+        case 4:
             DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){645 +coracaoRec.width*0.5, 50}, RAYWHITE);
-        case 2:
+        case 3:
             DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){640 -coracaoRec.width*0.5, 50}, RAYWHITE);
-        case 1:
+        case 2:
             DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){635 -coracaoRec.width*1.5, 50}, RAYWHITE);
+        case 1:
+            DrawTextureRec(Coracao.image, coracao2Rec, (Vector2){630 -coracaoRec.width*2.5, 50}, RAYWHITE);
             break;
         default:
             break;
