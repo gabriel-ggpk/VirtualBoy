@@ -109,6 +109,7 @@ int main(){
            case 1:
             if(faseRunner() == 1){
                 fase = 0;
+        
                 
             }
             else if(faseRunner() == 2) {fase =-1; gemasColetadas=1;}
