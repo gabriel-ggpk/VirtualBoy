@@ -387,9 +387,9 @@ if(!portalativo){
                 DrawText("pressione 0 para voltar",100,700,20,RED);
             }*/
              if(lost){
-                DrawRectangleGradientH(0,0,1280,720,DARKGRAY,BLACK);
-                DrawText("YOU LOST!!!",300,360,100,RED);
-                DrawText("pressione R para tentar de novo,ou f para desistir",100,700,20,WHITE);
+                DrawRectangle(0,0,1280,720,DARKGRAY);
+                DrawText("você perdeu!!!",300,300,100,WHITE);
+                DrawText("pressione R para tentar de novo",100,700,20,WHITE);
             }
             
         EndDrawing();
