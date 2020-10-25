@@ -57,6 +57,8 @@ typedef struct{
 }Imagem;
 
 //globais
+int resultado4 = 0;
+
 hero virtualGuy;
 chefe computador;
 laser armaLaserDir;
@@ -127,8 +129,6 @@ void drawNivelBoss();
 
 
 int BOSS(){
-    int resultado4 = 0;
-
     Texture2D Industri = LoadTexture("assets/Boss/Industrial.png");
     Industri.width = Industri.width*2;
     Industri.height = Industri.height*2; 
@@ -464,6 +464,9 @@ void cenaComeco(){
             PlayMusicStream(computador.somBoss);
             parteCena = 3;
         }
+    }
+    if(parteCena == 4){
+        resultado4 = 1;
     }
 }
 
