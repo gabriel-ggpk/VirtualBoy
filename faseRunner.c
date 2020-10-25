@@ -114,6 +114,7 @@ void reset (){
     personagem.body->orient = 0;
     personagem.body->position.x = 400;
     personagem.body->position.y = GetScreenHeight() -ground.image.height*1.5 - 10;
+    personagem.body->velocity.y = 0;
 
     for(int i = 0; i < 3; i++){
         rock[i].position.x = -100;
@@ -128,7 +129,7 @@ void reset (){
 void contador(){
     frames_counter += GetFrameTime(), frames_countdown += GetFrameTime(), walking += GetFrameTime();
     frame_portal += GetFrameTime(), frame_coin += GetFrameTime();
-    if(win || dead) exitrun += GetFrameTime();
+    if(win) exitrun += GetFrameTime();
 
     if(frame_coin >= 0.2){
         coin.frame++;
@@ -159,7 +160,11 @@ void contador(){
     }
 
     if(countdown < 1 && walking >= 0.005 && !dead){
-        if(timer > -3 && !coindown) personagem.body->position.x += 5.0f;
+        if(timer > -3 && !coindown){
+            if(timer > 41) personagem.body->position.x += 5.0f;
+            else if(timer > 21) personagem.body->position.x += 6.0f;
+            else personagem.body->position.x += 7.0f;
+        }
         for(int i = 0; i < 3; i++)
             bird[i].position.x -= 1.2f;
 
@@ -219,7 +224,7 @@ void movimentacao(){
 void spawn(){
     if(countdown < 2) frame_spawn += GetFrameTime();
 
-    if(frame_spawn >= 4.25 && timer >= 5 && !dead){
+    if(frame_spawn >= 4.25 - (float)((61 - timer)/80) && timer >= 5 && !dead){
         int rand_spawn, rand_spawn1;
         if(spawn_set){
             spawn_set = false;
@@ -273,7 +278,7 @@ void spawn(){
         frame_spawn = 0;
     }
     else if(timer < 2 && coin.position.x == -100){
-        coin.position.x = personagem.body->position.x + screenWidth;
+        coin.position.x = personagem.body->position.x + screenWidth + 1;
         coin.position.y = 300;
     }
 }
@@ -389,9 +394,11 @@ void desenho(){
             else DrawText("Time: 0", 10, 10, 20, RAYWHITE);
         }
 
-        if(dead) DrawText("YOU LOSE", screenWidth/2 - 250, screenHeight/2 - 50, 100, RAYWHITE);
-
-        else if(timer < 0) DrawText("YOU WIN", screenWidth/2 - 225, screenHeight/2 - 50, 100, RAYWHITE);
+        if(dead){
+            DrawRectangle(0,0,1280,720,DARKGRAY);
+            DrawText("você perdeu!!!",300,300,100,WHITE);
+            DrawText("pressione R para tentar de novo",100,700,20,WHITE);
+        }
 
     EndDrawing();
 }
@@ -433,7 +440,7 @@ int faseRunner(void){
 
             else if(win && exitrun >= 2) retornoRunner = 2;
 
-            else if(dead && exitrun >= 2) retornoRunner = -1;
+            else if(dead && IsKeyPressed(KEY_R)) retornoRunner = -1;
 
             gameRunner();
         }
