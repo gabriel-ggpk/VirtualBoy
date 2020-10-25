@@ -225,7 +225,7 @@ void inicializarNivelBoss(){
     computador.colisao.height = computador.frameRec.height/1.5;
     computador.colisao.x = computador.posi.x + 16;
     computador.colisao.y = computador.posi.y;
-    computador.vida = 1;
+    computador.vida = 6;
     computador.somBoss = LoadMusicStream("sounds//Boss/ProveIt.mp3");
     SetMusicVolume(computador.somBoss, 0.2);
 
