@@ -141,10 +141,15 @@ void Iniciar(void)
 
     //Som
     Atirar = LoadSound("sounds/FaseNave/gun.wav");
+    SetSoundVolume(Atirar, 0.2);
     ExplodirI = LoadSound("sounds/FaseNave/explodeA.wav");
+    SetSoundVolume(ExplodirI, 0.2);
     ExplodirJ = LoadSound("sounds/FaseNave/explodeJ.wav");
+    SetSoundVolume(ExplodirJ, 0.2);
     Dano = LoadSound("sounds/FaseNave/dano.wav");
+    SetSoundVolume(Dano, 0.2);
     Trilha = LoadSound("sounds/FaseNave/trilha.mp3");
+    SetSoundVolume(Trilha, 0.2);
 
     //Fundo
     for (int i = 0; i < Num_Cenario; i++)
@@ -324,7 +329,7 @@ void Atualizar(void)
 
     if (gameOver == 3)
     {
-        if (IsKeyPressed(KEY_ENTER))
+        if (IsKeyPressed(KEY_R))
         {
             Iniciar();
             gameOver = 1;
@@ -828,7 +833,9 @@ void Desenhando(void)
     else if (gameOver == 3)
     {
         StopSound(Trilha);
-        DrawText("PRECIONE [ENTER] PARA JOGAR", GetScreenWidth() / 2 - MeasureText("PRECIONE [ENTER] PARA JOGAR", 20) / 2, GetScreenHeight() / 2 - 50, 20, BLACK);
+        ClearBackground(DARKGRAY);
+        DrawText("você perdeu!!!",300,300,100,WHITE);
+        DrawText("pressione R para tentar de novo",100,700,20,WHITE);
         InimigosMortes = 0;
         Vida = 3;
     }
@@ -845,6 +852,13 @@ void Descarregar(void)
     UnloadTexture(ExplosaoI);
     UnloadTexture(Aparecer);
     UnloadTexture(Diamante);
+
+    UnloadSound(Atirar);
+    UnloadSound(ExplodirI);
+    UnloadSound(ExplodirJ);
+    UnloadSound(Dano);
+    UnloadSound(Trilha);
+
 }
 
 int Fase3()

@@ -142,7 +142,7 @@ int BOSS(){
             resultado4 = 1;
         }
         if(IsKeyPressed(KEY_SPACE)){
-            
+            PlaySound(armaLaserEsc.somLaser);
         }
 
         atualizarNivelBoss();
@@ -208,6 +208,7 @@ void inicializarNivelBoss(){
     virtualGuy.colisao.width = virtualGuy.frameRec.width-32;
     virtualGuy.colisao.height = virtualGuy.frameRec.height-40;
     virtualGuy.somDano = LoadSound("sounds/Boss/hit-5.wav");
+    SetSoundVolume(virtualGuy.somDano, 0.2);
 
     computador.imagem = LoadTexture("assets/Boss/PC.png");
     computador.imagem.width = computador.imagem.width*6.4;
@@ -226,6 +227,7 @@ void inicializarNivelBoss(){
     computador.colisao.y = computador.posi.y;
     computador.vida = 1;
     computador.somBoss = LoadMusicStream("sounds//Boss/ProveIt.mp3");
+    SetMusicVolume(computador.somBoss, 0.2);
 
     armaLaserDir.imagem = LoadTexture("assets/Boss/laser.png");
     armaLaserDir.imagem.width = armaLaserDir.imagem.width*4;
@@ -244,6 +246,8 @@ void inicializarNivelBoss(){
     armaLaserDir.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
     armaLaserDir.somPausa = LoadSound("sounds/Boss/laser-9.wav");
     armaLaserDir.somLaser = LoadSound("sounds/Boss/laser-2.wav");
+    SetSoundVolume(armaLaserDir.somLaser, 0.2);
+    SetSoundVolume(armaLaserDir.somPausa, 0.2);
     armaLaserEsc.frameRec.width = armaLaserDir.imagem.width/3;
     armaLaserEsc.frameRec.height = armaLaserDir.imagem.height/32;
     armaLaserEsc.frameRec.x = 0;
@@ -258,6 +262,8 @@ void inicializarNivelBoss(){
     armaLaserEsc.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
     armaLaserEsc.somPausa = LoadSound("sounds/Boss/Failure.wav");
     armaLaserEsc.somLaser = LoadSound("sounds/Boss/Success.wav");
+    SetSoundVolume(armaLaserEsc.somLaser, 0.2);
+    SetSoundVolume(armaLaserEsc.somPausa, 0.2);
 
     armaCanhao.imagemArma = LoadTexture("assets/Boss/canhao.png");
     armaCanhao.imagemArma.width = armaCanhao.imagemArma.width*2;
