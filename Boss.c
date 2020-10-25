@@ -3,6 +3,7 @@
 //estruturas
 typedef struct{
     Texture2D imagem;
+    Sound somDano;
     Rectangle frameRec;
     Vector2 posi;
     Rectangle colisao;
@@ -20,19 +21,23 @@ typedef struct{
     Color cor;
     Color ceu;
     int vida;
+    Music somBoss;
 }chefe;
 typedef struct{
     Texture2D imagem;
+    Sound somPausa;
+    Sound somLaser;
     Rectangle frameRec;
+    Rectangle colisao;
     Vector2 posi;
     int atirar;
     int vel;
     int tiroVel;
-    Rectangle colisao;
 }laser;
 typedef struct{
     Texture2D imagemArma;
     Texture2D imagemTiro;
+    Sound somExplodir;
     Rectangle frameRec;
     Vector2 posi;
     int explodir;
@@ -52,6 +57,8 @@ typedef struct{
 }Imagem;
 
 //globais
+int resultado4 = 0;
+
 hero virtualGuy;
 chefe computador;
 laser armaLaserDir;
@@ -122,20 +129,20 @@ void drawNivelBoss();
 
 
 int BOSS(){
-    int resultado4 = 0;
-
     Texture2D Industri = LoadTexture("assets/Boss/Industrial.png");
     Industri.width = Industri.width*2;
-    Industri.height = Industri.height*2;
+    Industri.height = Industri.height*2; 
 
     inicializarSala(Industri);
     inicializarNivelBoss();
 
     while(resultado4 == 0){
+        UpdateMusicStream(computador.somBoss);
         if(IsKeyPressed(KEY_ZERO)){
             resultado4 = 1;
         }
         if(IsKeyPressed(KEY_SPACE)){
+            PlaySound(armaLaserEsc.somLaser);
         }
 
         atualizarNivelBoss();
@@ -162,6 +169,13 @@ int BOSS(){
     UnloadTexture(Back.layer6);
     UnloadTexture(Back.layer7);
     UnloadTexture(Back.layer8);
+    UnloadSound(virtualGuy.somDano);
+    UnloadSound(armaCanhao.somExplodir);
+    UnloadSound(armaLaserDir.somLaser);
+    UnloadSound(armaLaserDir.somPausa);
+    UnloadSound(armaLaserEsc.somLaser);
+    UnloadSound(armaLaserEsc.somPausa);
+    UnloadMusicStream(computador.somBoss);
 
     return resultado4;
 }
@@ -193,6 +207,8 @@ void inicializarNivelBoss(){
     virtualGuy.colisao.y = virtualGuy.posi.y;
     virtualGuy.colisao.width = virtualGuy.frameRec.width-32;
     virtualGuy.colisao.height = virtualGuy.frameRec.height-40;
+    virtualGuy.somDano = LoadSound("sounds/Boss/hit-5.wav");
+    SetSoundVolume(virtualGuy.somDano, 0.2);
 
     computador.imagem = LoadTexture("assets/Boss/PC.png");
     computador.imagem.width = computador.imagem.width*6.4;
@@ -210,6 +226,8 @@ void inicializarNivelBoss(){
     computador.colisao.x = computador.posi.x + 16;
     computador.colisao.y = computador.posi.y;
     computador.vida = 6;
+    computador.somBoss = LoadMusicStream("sounds//Boss/ProveIt.mp3");
+    SetMusicVolume(computador.somBoss, 0.2);
 
     armaLaserDir.imagem = LoadTexture("assets/Boss/laser.png");
     armaLaserDir.imagem.width = armaLaserDir.imagem.width*4;
@@ -226,6 +244,10 @@ void inicializarNivelBoss(){
     armaLaserDir.colisao.width = chao.width*17;
     armaLaserDir.colisao.height = 32;
     armaLaserDir.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
+    armaLaserDir.somPausa = LoadSound("sounds/Boss/laser-9.wav");
+    armaLaserDir.somLaser = LoadSound("sounds/Boss/laser-2.wav");
+    SetSoundVolume(armaLaserDir.somLaser, 0.2);
+    SetSoundVolume(armaLaserDir.somPausa, 0.2);
     armaLaserEsc.frameRec.width = armaLaserDir.imagem.width/3;
     armaLaserEsc.frameRec.height = armaLaserDir.imagem.height/32;
     armaLaserEsc.frameRec.x = 0;
@@ -238,6 +260,10 @@ void inicializarNivelBoss(){
     armaLaserEsc.colisao.width = chao.width*17;
     armaLaserEsc.colisao.height = 32;
     armaLaserEsc.colisao.x = (GetScreenWidth()-tetoLinha.width*17)/2;
+    armaLaserEsc.somPausa = LoadSound("sounds/Boss/Failure.wav");
+    armaLaserEsc.somLaser = LoadSound("sounds/Boss/Success.wav");
+    SetSoundVolume(armaLaserEsc.somLaser, 0.2);
+    SetSoundVolume(armaLaserEsc.somPausa, 0.2);
 
     armaCanhao.imagemArma = LoadTexture("assets/Boss/canhao.png");
     armaCanhao.imagemArma.width = armaCanhao.imagemArma.width*2;
@@ -251,6 +277,7 @@ void inicializarNivelBoss(){
     armaCanhao.frameRec.y = 0;
     armaCanhao.posi.x = GetScreenWidth()/2 - (armaCanhao.frameRec.width/2);
     armaCanhao.posi.y = GetScreenHeight()/2 + (chao.height*4.8);
+    armaCanhao.somExplodir = LoadSound("sounds/Boss/explode-2.wav");
 
 
     Back.layer1 = LoadTexture("assets/Boss/Clouds_01.png");
@@ -334,7 +361,8 @@ void drawNivelBoss(){
         
         drawLaser();
         DrawTexture(armaCanhao.imagemArma, GetScreenWidth()/2 - (armaCanhao.imagemArma.width/2), GetScreenHeight()/2 + (chao.height*7), RAYWHITE);
-        DrawTextureRec(armaCanhao.imagemTiro, armaCanhao.frameRec, armaCanhao.posi, GREEN);
+        if(canhaoAtiva != -1)
+            DrawTextureRec(armaCanhao.imagemTiro, armaCanhao.frameRec, armaCanhao.posi, GREEN);
 
         DrawLifeBar(computador.vida);
         DrawCoracao(virtualGuy.vida);
@@ -342,12 +370,20 @@ void drawNivelBoss(){
         DrawTextureRec(portal4.image, portal4Rec, (Vector2){GetScreenWidth()/2 -portal4Rec.width/2, GetScreenHeight()/2}, RAYWHITE);
         //DrawRectangleLines(virtualGuy.colisao.x, virtualGuy.colisao.y, virtualGuy.colisao.width, virtualGuy.colisao.height, BLUE);
         //DrawCircleLines(armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2), 10.0, RED);
+        if(parteCena == -1){
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), DARKGRAY);
+            DrawText("você perdeu!!!",300,300,100,WHITE);
+            DrawText("pressione R para tentar de novo",100,700,20,WHITE);
+        }
     EndDrawing();
 }
 
 //cenas
 void cenaComeco(){
     if(virtualGuy.vida == 0){
+        StopMusicStream(computador.somBoss);
+        virtualGuy.vida = -1;
+        PlaySound(armaLaserEsc.somPausa);
         parteCena = -1;
         computador.cor = RED;
         computador.ceu = GRAY;
@@ -355,7 +391,11 @@ void cenaComeco(){
         canhaoAtiva = -1;
     }
     if(computador.vida == 0){
+        StopMusicStream(computador.somBoss);
+        computador.vida = -1;
+        PlaySound(armaLaserEsc.somLaser);
         parteCena = 4;
+        computador.frameRec.x = computador.frameRec.width*4;
         computador.cor = RAYWHITE;
         computador.ceu = (Color){102, 191, 205};
         lasersAtivos = 0;
@@ -401,6 +441,7 @@ void cenaComeco(){
             frameAtual3++;
             if(frameAtual3 > 7){
                 parteCena = 3;
+                PlayMusicStream(computador.somBoss);
                 computador.frameRec.y = computador.frameRec.height*2;
                 lasersAtivos = 1;
                 canhaoAtiva = 0;
@@ -409,9 +450,25 @@ void cenaComeco(){
                 portal4Rec.x = portal4Rec.width*frameAtual3;
         }
     }
+    if(parteCena == -1){
+        if(IsKeyPressed(KEY_R)){
+            virtualGuy.vida = 3;
+            virtualGuy.lado = 1;
+            virtualGuy.dano = 0;
+            virtualGuy.linha = 2;
+            virtualGuy.posi.x = GetScreenWidth()/2 -virtualGuy.frameRec.width/2;
+            virtualGuy.posi.y = GetScreenHeight()/2 +chao.height;
+            computador.vida = 6;
+            lasersAtivos = 1;
+            canhaoAtiva = 0;
+            PlayMusicStream(computador.somBoss);
+            parteCena = 3;
+        }
+    }
+    if(parteCena == 4){
+        resultado4 = 1;
+    }
 }
-
-//rotina do jogo
 
 //personagem movimentos
 void atualizarPersonagem(){
@@ -519,6 +576,7 @@ void atualizarPersonagem(){
     }
 
     if(CheckCollisionRecs(virtualGuy.colisao, armaLaserEsc.colisao)){
+        PlaySound(virtualGuy.somDano);
         virtualGuy.dano = 60;
         virtualGuy.vida--;
         if(virtualGuy.lado == 1){
@@ -529,6 +587,7 @@ void atualizarPersonagem(){
         }
     }
     if(CheckCollisionRecs(virtualGuy.colisao, armaLaserDir.colisao)){
+        PlaySound(virtualGuy.somDano);
         virtualGuy.dano = 60;
         virtualGuy.vida--;
         if(virtualGuy.lado == 1){
@@ -539,6 +598,7 @@ void atualizarPersonagem(){
         }
     }
     if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 10.0, virtualGuy.colisao)){
+        PlaySound(virtualGuy.somDano);
         virtualGuy.dano = 60;
         virtualGuy.vida--;
         armaCanhao.explodir = 1;
@@ -601,35 +661,37 @@ void animaPersonagem(){
 void animaComputador(){
     static int ivuneravel = 0;
 
-    if(ivuneravel > 0){
-        computador.frameRec.x = computador.frameRec.width*4;
-        computador.cor = RAYWHITE;
-        computador.ceu = (Color){102, 191, 205};
-        ivuneravel--;
-    }
+    if(computador.vida > 0){
+        if(ivuneravel > 0){
+            computador.frameRec.x = computador.frameRec.width*4;
+            computador.cor = RAYWHITE;
+            computador.ceu = (Color){102, 191, 205};
+            ivuneravel--;
+        }
 
-    if(parteCena > 2){
-        if(ivuneravel == 0){
-            computador.ceu = GRAY;
-            computador.cor = RED;
-            if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 5.0, computador.colisao)){
-                ivuneravel = 150;
-                computador.vida--;
+        if(parteCena > 2){
+            if(ivuneravel == 0){
+                computador.ceu = GRAY;
+                computador.cor = RED;
+                if(CheckCollisionCircleRec((Vector2){armaCanhao.posi.x + (armaCanhao.frameRec.width/2), armaCanhao.posi.y + (armaCanhao.frameRec.height/2)}, 5.0, computador.colisao)){
+                    ivuneravel = 150;
+                    computador.vida--;
+                }
             }
         }
-    }
 
-    if(parteCena != 4){
-        static int frameCont  = 0;
-        static int frameAtual  = 0;
-        frameCont++;
-        if (frameCont >= 60/2){
-            frameCont = 0;
-            frameAtual++;
-            if(frameAtual > 1){
-                frameAtual = 0;
+        if(parteCena != 4){
+            static int frameCont  = 0;
+            static int frameAtual  = 0;
+            frameCont++;
+            if (frameCont >= 60/2){
+                frameCont = 0;
+                frameAtual++;
+                if(frameAtual > 1){
+                    frameAtual = 0;
+                }
+                computador.frameRec.x = computador.frameRec.width*frameAtual;
             }
-            computador.frameRec.x = computador.frameRec.width*frameAtual;
         }
     }
 }
@@ -681,6 +743,7 @@ void animaLaser(){
             frameContEsc = 0;
             frameAtualEsc++;
             if(frameAtualEsc == 5){
+                PlaySound(armaLaserDir.somLaser);
                 armaLaserEsc.colisao.y = armaLaserEsc.posi.y + (armaLaserEsc.frameRec.height/4);
             }
             if(frameAtualEsc == 11){
@@ -699,6 +762,7 @@ void animaLaser(){
             frameContDir = 0;
             frameAtualDir++;
             if(frameAtualDir == 21){
+                PlaySound(armaLaserDir.somLaser);
                 armaLaserDir.colisao.y = armaLaserDir.posi.y + (armaLaserDir.frameRec.height/4);
             }
             if(frameAtualDir == 27){
@@ -734,6 +798,7 @@ void moveLaser(){
         if(pararLaserDir == 1){
             esperarDir++;
             if(esperarDir == armaLaserDir.tiroVel){
+                PlaySound(armaLaserDir.somPausa);
                 armaLaserDir.atirar = 1;
             }
             if(esperarDir == armaLaserDir.tiroVel + 120){
@@ -746,13 +811,14 @@ void moveLaser(){
         if(descansarEsc <=0){
             if(armaLaserEsc.posi.y - (armaLaserEsc.frameRec.height/2) > virtualGuy.posi.y-(2* virtualGuy.frameRec.height/4) &&
                armaLaserEsc.posi.y - (armaLaserEsc.frameRec.height/2) < virtualGuy.posi.y - (virtualGuy.frameRec.height/3)){
-                pararLaserEsc = 1;
+                pararLaserEsc = 1;;
                 descansarEsc = 100;
             }
         }
         if(pararLaserEsc == 1){
             esperarEsc++;
             if(esperarEsc == armaLaserEsc.tiroVel){
+                PlaySound(armaLaserDir.somPausa);
                 armaLaserEsc.atirar = 1;
             }
             if(esperarEsc == armaLaserEsc.tiroVel+ 120){
@@ -815,6 +881,8 @@ void animaCanhao(){
                 armaCanhao.posi.y = GetScreenHeight()*2;
                 armaCanhao.explodir = 0;
             }
+            if(frameAtual == 3)
+                PlaySound(armaCanhao.somExplodir);
             armaCanhao.frameRec.x = armaCanhao.frameRec.width*frameAtual;
         }
     }
@@ -861,9 +929,6 @@ void funcionaCanhao(){
     static int frameCont  = 0;
     static int frameAtual  = 0;
 
-    if(canhaoAtiva == -1){
-        armaCanhao.posi.x = 5000;
-    }
     if(canhaoAtiva == 0){
         frameCont++;
         if (frameCont >= 60){
@@ -914,11 +979,12 @@ void DrawCoracao(int vida){
     }
 }
 void DrawLifeBar(int vida){
-    DrawTextureRec(LifeBar.image, (Rectangle){0, 50, LifeBar.image.width/3, 50}, (Vector2){316, 650}, RAYWHITE);
+    DrawTextureRec(LifeBar.image, (Rectangle){0, 50, LifeBar.image.width/3, 50}, (Vector2){311 +LifeBar.image.width/3, 650}, RAYWHITE);
+    DrawTextureRec(LifeBar.image, (Rectangle){LifeBar.image.width/3 *2, 50, LifeBar.image.width/3, 50}, (Vector2){321 + LifeBar.image.width/3 *6, 650}, RAYWHITE);
     for(int i = 0; i < 6; i++){
         DrawTextureRec(LifeBar.image, (Rectangle){LifeBar.image.width/3, 50, LifeBar.image.width/3, 50}, (Vector2){316 + LifeBar.image.width/3*(i+1), 650}, RAYWHITE);
     }
-    DrawTextureRec(LifeBar.image, (Rectangle){LifeBar.image.width/3 *2, 50, LifeBar.image.width/3, 50}, (Vector2){316 + LifeBar.image.width/3 *7, 650}, RAYWHITE);
+    
 
     
     for(int j = 0; j < vida; j++){
