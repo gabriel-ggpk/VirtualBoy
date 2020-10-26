@@ -8,8 +8,10 @@ int abertura(int gemasColetadas){
     const char textoInicial[] = "Finalmente! você acordou!              \nCalma, calma.\nSei que nada parece fazer sentido agora            \nem resumo eu criei você para pegar certos artefatos para mim\nEntao...                 \nMÃOS A OBRA!!!";
     const char textofase1[] ="Bem facil né?\nnão pare agora, precisamos de mais dois artefatos.                                                   \n.  .  .                      \n TA OLHANDO OQUE?            \n V A I   L O G O ! ! !";
     const char textofase2[] ="Uau, aquelas coisas surgindo do nada foram bem divertidas não acha? \nNão???            \nVocê é muito chato. \nVamos lá só falta uma, você consegue...                   \nEu acho.";
-    const char textofase3[] ="Finalmente!!! ainda bem que você não destruiu a nave\nentão é isso... \ncomo você não tem mais proposito acho melhor eu acabar com seu sofrimento...                      A G O R A   M O R R A ! ! !";
+    const char textofase3[] ="Finalmente!!! ainda bem que você não destruiu a nave\nentão é isso... \ncomo você não tem mais proposito acho melhor eu acabar com seu sofrimento...                      \nA G O R A   M O R R A ! ! !";
     const char textofase4[] ="VOCÊ GANHOU!!!";
+    Music vitoria = LoadMusicStream("sounds/victory.mp3");
+    SetMusicVolume(vitoria,0.1f);
     Texture2D PC = LoadTexture("assets/Boss/PC.png");
     PC.width = PC.width*10;
     PC.height = PC.height*10;
@@ -39,6 +41,7 @@ int abertura(int gemasColetadas){
     int portAtual  = 0;
 
     while(retorno == 0){
+        UpdateMusicStream(vitoria);
         framesTexto++;
 
         framePc++;
@@ -57,6 +60,10 @@ int abertura(int gemasColetadas){
                     framePC.y = 2*framePC.height;
                 }
                 else framePC.x = 0;
+            }
+            if(gemasColetadas == 3&& (framesTexto/5)>=203){
+                framePC.x = framePC.width;
+                framePC.y = 2*framePC.height;
             }
         }
         if(AnimaPort == 1){
@@ -82,6 +89,8 @@ int abertura(int gemasColetadas){
         if(IsKeyPressed(KEY_ENTER))
             AnimaPort = 1;
 
+        if(gemasColetadas == 4)PlayMusicStream(vitoria);
+
         BeginDrawing();
             ClearBackground(BLACK);
             DrawTextureRec(PC, framePC, (Vector2){GetScreenWidth()/2 -framePC.width/2, 20}, RAYWHITE);
@@ -106,6 +115,7 @@ int abertura(int gemasColetadas){
     UnloadTexture(PC);
     UnloadTexture(Guy);
     UnloadTexture(Port);
+    UnloadMusicStream(vitoria);
     if(gemasColetadas==0)return 0;
     if(gemasColetadas==1)return 1;
     if(gemasColetadas==2)return 2;

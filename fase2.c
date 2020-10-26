@@ -156,7 +156,7 @@ backgroundFase2.width *=10 ;
 backgroundFase2.height *=10;
 backgroundFase2rect = (Rectangle) {0,0,backgroundFase2.width,backgroundFase2.height};
 
-PhysicsBody base = CreatePhysicsBodyRectangle((Vector2){ 0, 50 }, 450, 100, 10);
+PhysicsBody base = CreatePhysicsBodyRectangle((Vector2){ 0, 50 }, 1280, 100, 10);
 base->enabled = false;
 
     cameraJumper.target = (Vector2) {0,-100};
@@ -380,7 +380,7 @@ if(!portalativo){
 
             
             EndMode2D();
-            DrawText(TextFormat("%d", segundos),1100,600,50,RED);
+            DrawText(TextFormat("%d", segundos),1200,650,40,DARKGRAY);
             /*if(victoryFase2&&gotCristal){
                 DrawRectangleGradientH(0,0,1280,720,DARKGRAY,WHITE);
                 DrawText("YOU WON!!!",300,360,100,PURPLE);
@@ -415,6 +415,7 @@ while(!endgame){
     UpdateMusicStream(musicfase2);
     Refresh();
     Desenhar();
+    if(IsKeyDown(KEY_ZERO))return 2;
 }
     fechar();
     if(gotCristal) return 2;
