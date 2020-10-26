@@ -216,7 +216,7 @@ void inicializarNivelBoss(){
     computador.frameRec.width = computador.imagem.width/5;
     computador.frameRec.height = computador.imagem.height/3;
     computador.frameRec.x = computador.frameRec.width*0;
-    computador.frameRec.y = computador.frameRec.height*1;
+    computador.frameRec.y = computador.frameRec.height*2;
     computador.posi.x = (GetScreenWidth()/2) - chao.width*1.5;
     computador.posi.y = chao.height*6;
     computador.cor = RAYWHITE;
