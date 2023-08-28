@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include <math.h>
 
-//Define struct do fundo
+// Define struct do fundo
 typedef struct
 {
     Rectangle rect;
@@ -9,20 +9,20 @@ typedef struct
 
 } Espaco;
 
-//Define struct da vida
+// Define struct da vida
 typedef struct
 {
     Vector2 VidaLocal;
 } BarraVida;
 
-//Define struct da esmeralda
+// Define struct da esmeralda
 typedef struct
 {
     Rectangle rect;
     Vector2 EsmeraldaLocal;
 } Esmeralda;
 
-//Define struct do jogador.
+// Define struct do jogador.
 typedef struct
 {
     int currentFrame;
@@ -34,7 +34,7 @@ typedef struct
     bool Explodir;
 } Jogador;
 
-//Define struct do tiro.
+// Define struct do tiro.
 typedef struct
 {
     Rectangle rect;
@@ -44,7 +44,7 @@ typedef struct
     bool Ativo;
 } Tiro;
 
-//Define struct do inimigo.
+// Define struct do inimigo.
 typedef struct
 {
     int currentFrame;
@@ -58,7 +58,7 @@ typedef struct
     bool Ativo;
 } Inimigo;
 
-//Define struct do portal
+// Define struct do portal
 typedef struct
 {
     int currentFrameX;
@@ -121,25 +121,25 @@ static Sound ExplodirJ;
 static Sound Dano;
 static Sound Trilha;
 
-//Inicializa
+// Inicializa
 static void Iniciar(void);
 
-//Teletransporte
+// Teletransporte
 static void Teletransporte(void);
 
-//Atualiza
+// Atualiza
 static void Atualizar(void);
 
-//Desenha
+// Desenha
 static void Desenhando(void);
 
-//Descarrega
+// Descarrega
 static void Descarregar(void);
 
-void Iniciar(void)
+static void Iniciar(void)
 {
 
-    //Som
+    // Som
     Atirar = LoadSound("sounds/FaseNave/gun.wav");
     SetSoundVolume(Atirar, 0.2);
     ExplodirI = LoadSound("sounds/FaseNave/explodeA.wav");
@@ -151,7 +151,7 @@ void Iniciar(void)
     Trilha = LoadSound("sounds/FaseNave/trilha.mp3");
     SetSoundVolume(Trilha, 0.2);
 
-    //Fundo
+    // Fundo
     for (int i = 0; i < Num_Cenario; i++)
     {
         espaco[i].rect.height = GetScreenHeight();
@@ -174,24 +174,24 @@ void Iniciar(void)
     Cenario.width = GetScreenWidth() / 2;
     Cenario.height = GetScreenHeight();
 
-    //Barra de vida
+    // Barra de vida
     for (int i = 0; i < Vida; i++)
     {
         vida[i].VidaLocal.x = 65 * i;
         vida[i].VidaLocal.y = 0;
     }
 
-    //Esmeralda
+    // Esmeralda
     pedra.rect.height = 16;
     pedra.rect.width = 16;
     pedra.rect.x = 0;
     pedra.rect.y = 0;
-    pedra.EsmeraldaLocal.x = GetScreenWidth()/2;
+    pedra.EsmeraldaLocal.x = GetScreenWidth() / 2;
     pedra.EsmeraldaLocal.y = -30;
 
     Diamante = LoadTexture("assets/cristalVerde.png");
 
-    //Jogador
+    // Jogador
     jogador.NaveLocal.x = (GetScreenWidth() / 2) - 65;
     jogador.NaveLocal.y = GetScreenHeight() / 2 + GetScreenHeight() / 3;
 
@@ -213,7 +213,7 @@ void Iniciar(void)
     Nave[3] = LoadTexture("assets/Fase3/Nave2D.png");
     Nave[4] = LoadTexture("assets/Fase3/Nave3D.png");
 
-    //Tiro
+    // Tiro
     for (int i = 0; i < Num_Tiro; i++)
     {
         tiro[i].rect.width = 23;
@@ -228,7 +228,7 @@ void Iniciar(void)
 
     Tiros = LoadTexture("assets/Fase3/Tiro1.png");
 
-    //Inimigo
+    // Inimigo
     for (int i = 0; i < Num_Inimigos; i++)
     {
         inimigo[i].rect.width = 64;
@@ -257,7 +257,7 @@ void Iniciar(void)
 
     ExplosaoI = LoadTexture("assets/Fase3/explosao.png");
 
-    //Portal
+    // Portal
     portal.currentFrameX = 0;
     portal.currentFrameY = 1;
     portal.Teletransporte.width = 480;
@@ -272,9 +272,9 @@ void Iniciar(void)
     Aparecer.width = 3840;
 }
 
-void Teletransporte(void)
+static void Teletransporte(void)
 {
-    //Portal
+    // Portal
     ContadorFrame++;
     if (portal.Teletransportar)
     {
@@ -298,7 +298,7 @@ void Teletransporte(void)
                 }
                 else if (portal.currentFrameY == 2)
                 {
-                    if(Cutscene)
+                    if (Cutscene)
                     {
                         portal.currentFrameY = 1;
                         Cutscene = false;
@@ -316,10 +316,9 @@ void Teletransporte(void)
             portal.Teletransporte.y = portal.currentFrameY * 128;
         }
     }
-
 }
 
-void Atualizar(void)
+static void Atualizar(void)
 {
 
     if (Cutscene)
@@ -346,55 +345,57 @@ void Atualizar(void)
 
         if (!pause)
         {
-            
+
             if (InimigosMortes >= Objetivo)
             {
-                
-                //Cena final
+
+                // Cena final
                 Endscene = true;
 
-                //Explosão de todos inimigos
+                // Explosão de todos inimigos
                 for (int i = 0; i < AtivarInimigos; i++)
                 {
                     inimigo[i].ExpLocal.x = inimigo[i].hit.x;
                     inimigo[i].ExpLocal.y = inimigo[i].hit.y;
                 }
 
-                //Movimentacao pedra
-                if(pedra.EsmeraldaLocal.y != GetScreenHeight()/2)
+                // Movimentacao pedra
+                if (pedra.EsmeraldaLocal.y != GetScreenHeight() / 2)
                 {
                     pedra.EsmeraldaLocal.y += 3;
                 }
 
                 else
                 {
-                    //Movimentacao jogador
-                    static float x, y;
-                    static float dx, dy;
-                    static float A, B;
+                    // Movimentacao jogador
+                    static float x;
+                    static float y;
+                    static float dx;
+                    static float dy;
+                    static float A;
+                    static float B;
                     int tempo = 30;
 
                     x = jogador.NaveLocal.x;
                     y = jogador.NaveLocal.y;
                     dx = x - (pedra.EsmeraldaLocal.x - 25);
                     dy = y - (pedra.EsmeraldaLocal.y - 20);
-                    A = dx/tempo;
-                    B = dy/tempo;
+                    A = dx / tempo;
+                    B = dy / tempo;
 
-                   
                     jogador.NaveLocal.x -= A;
                     jogador.NaveLocal.y -= B;
-                    if( pow(dx, 2) < 16 )
+                    if (pow(dx, 2) < 16)
                     {
-                        if(dx > -10)
+                        if (dx > -10)
                         {
-                            //Ativando portal
+                            // Ativando portal
                             Cristal = true;
                             portal.PortalLocal.x = jogador.NaveLocal.x - 200;
                             portal.PortalLocal.y = jogador.NaveLocal.y - 50;
-                            
+
                             portal.Teletransportar = true;
-                            
+
                             Teletransporte();
                         }
                     }
@@ -404,14 +405,14 @@ void Atualizar(void)
 
         if (!parado)
         {
-            if(!Endscene)
+            if (!Endscene)
             {
-                if(!IsSoundPlaying(Trilha))
+                if (!IsSoundPlaying(Trilha))
                 {
                     PlaySound(Trilha);
                 }
-                
-                //Comportamento do fundo
+
+                // Comportamento do fundo
                 for (int i = 0; i < Num_Cenario; i++)
                 {
                     espaco[i].FundoLocal.y += 10;
@@ -421,7 +422,7 @@ void Atualizar(void)
                     }
                 }
 
-                //Movimentacao, comportamento e movimentando os sprites do jogador.
+                // Movimentacao, comportamento e movimentando os sprites do jogador.
                 if (!jogador.Explodir)
                 {
                     if (IsKeyDown(KEY_RIGHT))
@@ -460,7 +461,7 @@ void Atualizar(void)
                 }
             }
 
-            //Colisao jogador inimigo
+            // Colisao jogador inimigo
             if (Invulneravel == false && !Endscene)
             {
                 for (int i = 0; i < AtivarInimigos; i++)
@@ -471,7 +472,6 @@ void Atualizar(void)
                         {
                             Vida--;
                             PlaySound(ExplodirJ);
-                            //StopSound(Trilha);
                             jogador.ExpLocal.x = jogador.hit.x;
                             jogador.ExpLocal.y = jogador.hit.y;
                             jogador.Explodir = true;
@@ -495,7 +495,7 @@ void Atualizar(void)
                 }
             }
 
-            //Tiro.
+            // Tiro.
             if (!jogador.Explodir)
             {
                 if (IsKeyDown(KEY_SPACE))
@@ -531,19 +531,18 @@ void Atualizar(void)
                     {
                         if (inimigo[j].Ativo)
                         {
-                            //Destruindo todos inimigos
-                            if(InimigosMortes >= Objetivo)
+                            // Destruindo todos inimigos
+                            if (InimigosMortes >= Objetivo)
                             {
-                                for (int i = 0; i < AtivarInimigos; i++)
+                                for (int k = 0; k < AtivarInimigos; k++)
                                 {
                                     PlaySound(ExplodirI);
-                                    inimigo[i].Explodir = true;
-                                    inimigo[i].ExpLocal.x = inimigo[i].hit.x;
-                                    inimigo[i].ExpLocal.y = inimigo[i].hit.y;
-                                    
+                                    inimigo[k].Explodir = true;
+                                    inimigo[k].ExpLocal.x = inimigo[k].hit.x;
+                                    inimigo[k].ExpLocal.y = inimigo[k].hit.y;
                                 }
                             }
-                            //Colisao bala inimigo
+                            // Colisao bala inimigo
                             else if (CheckCollisionRecs(tiro[i].hit, inimigo[j].hit))
                             {
                                 tiro[i].Ativo = false;
@@ -578,10 +577,10 @@ void Atualizar(void)
                     }
                 }
             }
-            
-            if(!Endscene)
+
+            if (!Endscene)
             {
-                //Inimigo.
+                // Inimigo.
                 for (int i = 0; i < AtivarInimigos; i++)
                 {
                     if (inimigo[i].Ativo)
@@ -596,7 +595,7 @@ void Atualizar(void)
 
                             if (inimigo[i].Velocidade.y == 8)
                             {
-                                //Meteoro nasce perto do jogador
+                                // Meteoro nasce perto do jogador
                                 inimigo[i].hit.x = GetRandomValue(jogador.NaveLocal.x - (GetScreenWidth() / 8), jogador.NaveLocal.x + (GetScreenWidth() / 8));
                                 inimigo[i].hit.y = GetRandomValue(-GetScreenHeight(), -64);
                             }
@@ -610,9 +609,9 @@ void Atualizar(void)
                 }
             }
 
-            //Explosão
+            // Explosão
             framesCounter++;
-            //do inimigo
+            // do inimigo
             for (int j = 0; j < AtivarInimigos; j++)
             {
                 if (inimigo[j].Explodir)
@@ -631,9 +630,9 @@ void Atualizar(void)
                 }
             }
 
-            if(!Endscene)
+            if (!Endscene)
             {
-                //do jogador
+                // do jogador
                 if (jogador.Explodir)
                 {
                     if (framesCounter >= (60 / framesSpeed))
@@ -654,39 +653,37 @@ void Atualizar(void)
             {
                 framesCounter = 0;
             }
-            
         }
     }
 }
 
-void Desenhando(void)
+static void Desenhando(void)
 {
-    //HitBox do jogador
+    // HitBox do jogador
     jogador.hit.x = jogador.NaveLocal.x + 6;
     jogador.hit.y = jogador.NaveLocal.y + 2;
 
     BeginDrawing();
     ClearBackground(WHITE);
 
-
     if (gameOver < 3)
     {
-        //Desenhando fundo
+        // Desenhando fundo
         for (int i = 0; i < Num_Cenario; i++)
         {
             DrawTextureRec(Cenario, espaco[i].rect, espaco[i].FundoLocal, WHITE);
         }
 
-        //Desenhando pontuacao
+        // Desenhando pontuacao
         DrawText(TextFormat("INIMIGOS: %i ", (Objetivo - InimigosMortes)), (5 * GetScreenWidth() / 12), 15, 30, WHITE);
 
-        //Desenhando vida
+        // Desenhando vida
         for (int i = 0; i < Vida; i++)
         {
             DrawTexture(Nave[2], vida[i].VidaLocal.x, vida[i].VidaLocal.y, WHITE);
         }
 
-        //Desenhando Portal
+        // Desenhando Portal
         if (Cutscene)
         {
 
@@ -699,18 +696,17 @@ void Desenhando(void)
 
         if (gameOver == 1)
         {
-            if(!Endscene)
+            if (!Endscene)
             {
 
-            
-                //Desenhando tiro
+                // Desenhando tiro
                 for (int i = 0; i < Num_Tiro; i++)
                 {
                     if (tiro[i].Ativo)
                         DrawTextureRec(Tiros, tiro[i].rect, tiro[i].TiroLocal, WHITE);
                 }
 
-                //Desenhando inimigo
+                // Desenhando inimigo
                 for (int i = 0; i < AtivarInimigos; i++)
                 {
                     if (inimigo[i].Ativo)
@@ -732,7 +728,7 @@ void Desenhando(void)
                         }
                         DrawTextureRec(Adversario[TiposNave], inimigo[i].rect, inimigo[i].InimigoLocal, WHITE);
 
-                        //Desenhando explosão inimigo
+                        // Desenhando explosão inimigo
                         if (inimigo[i].Explodir)
                         {
                             DrawTextureRec(ExplosaoI, inimigo[i].Explo, inimigo[i].ExpLocal, GOLD);
@@ -740,7 +736,7 @@ void Desenhando(void)
                     }
                 }
 
-                //Desenhando jogador
+                // Desenhando jogador
                 if (!jogador.Explodir)
                 {
                     if (!Invulneravel)
@@ -774,7 +770,7 @@ void Desenhando(void)
                     }
                 }
 
-                //Desenhando Explosão jogador
+                // Desenhando Explosão jogador
                 else if (jogador.Explodir)
                 {
                     DrawTextureRec(ExplosaoI, jogador.Explo, jogador.ExpLocal, ORANGE);
@@ -794,13 +790,13 @@ void Desenhando(void)
 
             else
             {
-                //Desenhando fundo
+                // Desenhando fundo
                 for (int i = 0; i < Num_Cenario; i++)
                 {
                     DrawTextureRec(Cenario, espaco[i].rect, espaco[i].FundoLocal, WHITE);
                 }
 
-                //Desenhando explosão inimigo
+                // Desenhando explosão inimigo
                 for (int i = 0; i < AtivarInimigos; i++)
                 {
                     if (inimigo[i].Explodir)
@@ -809,20 +805,20 @@ void Desenhando(void)
                     }
                 }
 
-                //Desenhando Pedra
-                if(portal.currentFrameY != 2)
+                // Desenhando Pedra
+                if (portal.currentFrameY != 2)
                 {
-                    DrawTextureRec(Diamante, pedra.rect , pedra.EsmeraldaLocal, WHITE);
+                    DrawTextureRec(Diamante, pedra.rect, pedra.EsmeraldaLocal, WHITE);
                 }
-                
-                //Desenhando Nave
-                if(portal.currentFrameY != 2)
+
+                // Desenhando Nave
+                if (portal.currentFrameY != 2)
                 {
                     DrawTexture(Nave[2], jogador.NaveLocal.x, jogador.NaveLocal.y, WHITE);
                 }
 
-                //Desenhando Portal
-                if(Cristal && !victory)
+                // Desenhando Portal
+                if (Cristal && !victory)
                 {
                     DrawTextureRec(Aparecer, portal.Teletransporte, portal.PortalLocal, WHITE);
                 }
@@ -834,8 +830,8 @@ void Desenhando(void)
     {
         StopSound(Trilha);
         ClearBackground(DARKGRAY);
-        DrawText("você perdeu!!!",300,300,100,WHITE);
-        DrawText("pressione R para tentar de novo",100,700,20,WHITE);
+        DrawText("você perdeu!!!", 300, 300, 100, WHITE);
+        DrawText("pressione R para tentar de novo", 100, 700, 20, WHITE);
         InimigosMortes = 0;
         Vida = 3;
     }
@@ -843,7 +839,7 @@ void Desenhando(void)
     EndDrawing();
 }
 
-void Descarregar(void)
+static void Descarregar(void)
 {
     UnloadTexture(Cenario);
     UnloadTexture(Nave[5]);
@@ -858,7 +854,6 @@ void Descarregar(void)
     UnloadSound(ExplodirJ);
     UnloadSound(Dano);
     UnloadSound(Trilha);
-
 }
 
 int Fase3()
